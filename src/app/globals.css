@@ -1,0 +1,203 @@
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Inter:wght@300;400;500;600&display=swap');
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-background: #ffffff;
+  --color-foreground: #09090b;
+
+  --color-card: #ffffff;
+  --color-card-foreground: #09090b;
+
+  --color-popover: #ffffff;
+  --color-popover-foreground: #09090b;
+
+  --color-primary: #09090b;
+  --color-primary-foreground: #ffffff;
+
+  --color-secondary: #fdfaf3;
+  --color-secondary-foreground: #4a3728;
+
+  --color-muted: #f4f4f5;
+  --color-muted-foreground: #71717a;
+
+  --color-accent: #fdfaf3;
+  --color-accent-foreground: #4a3728;
+
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #fafafa;
+
+  --color-border: #e4e4e7;
+  --color-input: #e4e4e7;
+  --color-ring: #09090b;
+
+  --color-chart-1: #e67e22;
+  --color-chart-2: #2d8659;
+  --color-chart-3: #1e3a5f;
+  --color-chart-4: #f1c40f;
+  --color-chart-5: #e74c3c;
+
+  --color-sidebar: #fdfaf3;
+  --color-sidebar-foreground: #4a3728;
+  --color-sidebar-primary: #09090b;
+  --color-sidebar-primary-foreground: #ffffff;
+  --color-sidebar-accent: #f4f4f5;
+  --color-sidebar-accent-foreground: #09090b;
+  --color-sidebar-border: #e4e4e7;
+  --color-sidebar-ring: #09090b;
+
+  /* Custom Design System Tokens */
+  --color-retro-cream: #fdfaf3;
+  --color-retro-brown: #4a3728;
+  --color-blog-dark: #18181b;
+  --color-window-red: #e15b5b;
+  --color-window-yellow: #f1c40f;
+  --color-window-green: #2ecc71;
+
+  --font-display: "Newsreader", serif;
+  --font-sans: "Inter", sans-serif;
+
+  --radius-lg: 0.5rem;
+  --radius-md: calc(0.5rem - 2px);
+  --radius-sm: calc(0.5rem - 4px);
+
+  --shadow-retro: 4px 4px 0px #4a3728;
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: #e4e4e7;
+  }
+
+  :root {
+    --background: #ffffff;
+    --foreground: #09090b;
+    --card: #ffffff;
+    --card-foreground: #09090b;
+    --popover: #ffffff;
+    --popover-foreground: #09090b;
+    --primary: #09090b;
+    --primary-foreground: #ffffff;
+    --secondary: #fdfaf3;
+    --secondary-foreground: #4a3728;
+    --muted: #f4f4f5;
+    --muted-foreground: #71717a;
+    --accent: #fdfaf3;
+    --accent-foreground: #4a3728;
+    --destructive: #ef4444;
+    --destructive-foreground: #fafafa;
+    --border: #e4e4e7;
+    --input: #e4e4e7;
+    --ring: #09090b;
+    --radius: 0.5rem;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, .font-serif {
+    font-family: var(--font-display);
+    font-weight: 400;
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+
+  h2 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    line-height: 1.2;
+    margin-bottom: 2rem;
+  }
+
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 1024px;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  .retro-window {
+    background-color: var(--color-retro-cream);
+    border: 2px solid var(--color-retro-brown);
+    box-shadow: var(--shadow-retro);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .retro-window:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--color-retro-brown);
+  }
+
+  .link-underline {
+    position: relative;
+    text-decoration: none;
+  }
+
+  .link-underline::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    bottom: -2px;
+    left: 0;
+    background-color: currentColor;
+    transform: scaleX(0);
+    transform-origin: bottom right;
+    transition: transform 0.3s ease-out;
+  }
+
+  .link-underline:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
