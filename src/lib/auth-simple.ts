@@ -10,23 +10,32 @@ const secret = new TextEncoder().encode(
 );
 
 export async function signIn(email: string, password: string) {
-  const user = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  try {
+    const user = await db.select().from(users).where(eq(users.email, email)).limit(1);
 
-  if (!user[0]) {
-    throw new Error("Invalid credentials");
+    if (!user[0]) {
+      throw new Error("Invalid credentials");
+    }
+
+    const isValid = await bcrypt.compare(password, user[0].password);
+    if (!isValid) {
+      throw new Error("Invalid credentials");
+    }
+
+    const token = await new SignJWT({ userId: user[0].id, email: user[0].email })
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("7d")
+      .sign(secret);
+
+    return { token, user: { id: user[0].id, email: user[0].email, name: user[0].name } };
+  } catch (error: any) {
+    // Log the actual error for debugging
+    console.error("Sign in error:", error);
+    if (error.message && error.message.includes("Invalid credentials")) {
+      throw error;
+    }
+    throw new Error(`Database error: ${error.message || "Failed to connect to database"}`);
   }
-
-  const isValid = await bcrypt.compare(password, user[0].password);
-  if (!isValid) {
-    throw new Error("Invalid credentials");
-  }
-
-  const token = await new SignJWT({ userId: user[0].id, email: user[0].email })
-    .setProtectedHeader({ alg: "HS256" })
-    .setExpirationTime("7d")
-    .sign(secret);
-
-  return { token, user: { id: user[0].id, email: user[0].email, name: user[0].name } };
 }
 
 export async function getSession() {

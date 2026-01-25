@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { signIn } from "@/lib/auth-simple";
 import { cookies } from "next/headers";
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
@@ -26,6 +28,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ user: result.user });
   } catch (error: any) {
+    console.error("Login API error:", error);
     return NextResponse.json(
       { error: error.message || "Login failed" },
       { status: 401 }
