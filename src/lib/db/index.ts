@@ -6,12 +6,21 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL environment variable is not set");
 }
 
-// Ensure the connection string is properly formatted
+// Parse and fix the connection string if password contains @
+// PostgreSQL connection strings: postgresql://user:password@host:port/db
+// If password contains @, it must be URL encoded as %40
 let connectionString = process.env.DATABASE_URL;
 
-// If password contains @, it needs to be URL encoded
-// But since it's already in the env var, we'll use it as-is
-// The issue might be that Supabase needs the connection pooler URL instead
+// Check if password needs encoding (if @ appears before the @host part)
+const urlMatch = connectionString.match(/^postgresql:\/\/([^:]+):([^@]+)@(.+)$/);
+if (urlMatch) {
+  const [, user, password, rest] = urlMatch;
+  // If password contains @ that's not encoded, encode it
+  if (password.includes('@') && !password.includes('%40')) {
+    const encodedPassword = encodeURIComponent(password);
+    connectionString = `postgresql://${user}:${encodedPassword}@${rest}`;
+  }
+}
 
 const pool = new Pool({
   connectionString: connectionString,
@@ -20,7 +29,7 @@ const pool = new Pool({
   },
   max: 20,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 20000, // Increased timeout
+  connectionTimeoutMillis: 20000,
 });
 
 // Test connection on startup
