@@ -3,7 +3,7 @@
 import React from 'react';
 
 /**
- * Header component for arthurmello.ai
+ * Header component for snehadas.ai
  * Featuring glassmorphism effect, logo, and navigation links.
  */
 const Header = () => {
@@ -16,7 +16,7 @@ const Header = () => {
           className="text-sm font-medium tracking-wide text-[#221f1c] hover:opacity-80 transition-opacity"
           style={{ fontFamily: '"DM Sans", sans-serif' }}
         >
-          arthurmello.ai
+          snehadas.ai
         </a>
 
           {/* Navigation Section */}
@@ -29,11 +29,18 @@ const Header = () => {
               What I Do
             </a>
             <a
-              href="/stack"
+              href="#case-studies"
               className="link-underline text-sm font-medium text-[#7c736a] hover:text-[#221f1c] transition-colors"
               style={{ fontFamily: '"DM Sans", sans-serif' }}
             >
-              Tools
+              Case Studies
+            </a>
+            <a
+              href="#systems"
+              className="link-underline text-sm font-medium text-[#7c736a] hover:text-[#221f1c] transition-colors"
+              style={{ fontFamily: '"DM Sans", sans-serif' }}
+            >
+              Systems
             </a>
             <a
               href="/blog"
@@ -43,7 +50,7 @@ const Header = () => {
               Blog
             </a>
             <a
-              href="/about"
+              href="#about"
               className="link-underline text-sm font-medium text-[#7c736a] hover:text-[#221f1c] transition-colors"
               style={{ fontFamily: '"DM Sans", sans-serif' }}
             >

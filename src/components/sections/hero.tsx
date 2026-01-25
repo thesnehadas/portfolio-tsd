@@ -34,7 +34,7 @@ const HeroSection: React.FC = () => {
             fontSize: '14px',
           }}
         >
-          Arthur Mello
+          Sneha Das
         </p>
       </div>
 

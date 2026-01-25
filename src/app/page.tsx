@@ -1,10 +1,12 @@
 import Header from "@/components/sections/header";
 import HeroSection from "@/components/sections/hero";
-import WhoIHelp from "@/components/sections/who-i-help";
+import SocialProofSection from "@/components/sections/social-proof";
 import WhatIDo from "@/components/sections/what-i-do";
+import WhoIHelp from "@/components/sections/who-i-help";
+import CaseStudiesSection from "@/components/sections/case-studies";
 import ToolsSection from "@/components/sections/tools";
-import BlogSignalSection from "@/components/sections/blog-signal";
 import AboutSection from "@/components/sections/about";
+import BlogSignalSection from "@/components/sections/blog-signal";
 import ContactSection from "@/components/sections/contact";
 import Footer from "@/components/sections/footer";
 
@@ -14,11 +16,13 @@ export default function Home() {
       <Header />
       <main>
         <HeroSection />
-        <WhoIHelp />
+        <SocialProofSection />
         <WhatIDo />
+        <WhoIHelp />
+        <CaseStudiesSection />
         <ToolsSection />
-        <BlogSignalSection />
         <AboutSection />
+        <BlogSignalSection />
         <ContactSection />
       </main>
       <Footer />

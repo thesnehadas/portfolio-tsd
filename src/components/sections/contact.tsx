@@ -59,7 +59,7 @@ const ContactSection: React.FC = () => {
                 letterSpacing: '0.025em',
               }}
             >
-              contact.exe
+              Contact me.exe
             </span>
             
             {/* Window Controls */}
@@ -133,7 +133,7 @@ const ContactSection: React.FC = () => {
             </p>
 
             <a 
-              href="mailto:hello@arthurmello.ai"
+              href="mailto:hello@snehadas.ai"
               className="inline-flex items-center justify-center gap-2 whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring bg-foreground text-background hover:bg-foreground/90 font-medium tracking-wide rounded-sm h-12 px-10 text-base group"
               style={{
                 display: 'inline-flex',

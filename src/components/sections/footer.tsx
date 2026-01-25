@@ -25,7 +25,7 @@ const Footer = () => {
           ))}
         </div>
         <div className="text-center text-sm text-[#71717a] font-light">
-          © 2026 Arthur Mello
+          © 2026 Sneha Das
         </div>
       </div>
     </footer>

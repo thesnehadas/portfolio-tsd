@@ -4,9 +4,9 @@ import React from 'react';
 import { ArrowUpRight } from 'lucide-react';
 
 /**
- * ToolsSection Component
+ * ToolsSection Component (renamed to Systems)
  * 
- * Clones the "Tools" section of the website with pixel-perfect accuracy.
+ * Clones the "Systems" section of the website with pixel-perfect accuracy.
  * Features:
  * - Retro-inspired card-style buttons with colored window controls.
  * - Light cream background (retro-cream: #fdfaf3).
@@ -84,10 +84,10 @@ const ToolsSection: React.FC = () => {
   ];
 
   return (
-    <section id="learn" className="py-10 md:py-12 px-6 md:px-12 lg:px-24 max-w-5xl mx-auto scroll-mt-20">
+    <section id="systems" className="py-10 md:py-12 px-6 md:px-12 lg:px-24 max-w-5xl mx-auto scroll-mt-20">
       {/* Section Header */}
       <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-16 gap-4">
-        <h2 className="text-3xl md:text-4xl font-serif text-[#09090b]">Tools</h2>
+        <h2 className="text-3xl md:text-4xl font-serif text-[#09090b]">Systems</h2>
       </div>
 
       {/* Free Category */}
