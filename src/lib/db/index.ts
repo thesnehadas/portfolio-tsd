@@ -47,17 +47,9 @@ const pool = new Pool({
   connectionTimeoutMillis: 30000, // Increased timeout
 });
 
-// Test connection
+// Handle connection errors
 pool.on('error', (err) => {
   console.error('Database pool error:', err);
-});
-
-// Test connection on module load
-pool.connect().then((client) => {
-  console.log('Database connection successful');
-  client.release();
-}).catch((err) => {
-  console.error('Database connection failed:', err);
 });
 
 export const db = drizzle(pool, { schema });
