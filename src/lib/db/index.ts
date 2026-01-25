@@ -6,21 +6,36 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL environment variable is not set");
 }
 
-// Parse and fix the connection string if password contains @
+// Parse and properly encode the connection string
 // PostgreSQL connection strings: postgresql://user:password@host:port/db
-// If password contains @, it must be URL encoded as %40
-let connectionString = process.env.DATABASE_URL;
-
-// Check if password needs encoding (if @ appears before the @host part)
-const urlMatch = connectionString.match(/^postgresql:\/\/([^:]+):([^@]+)@(.+)$/);
-if (urlMatch) {
-  const [, user, password, rest] = urlMatch;
-  // If password contains @ that's not encoded, encode it
-  if (password.includes('@') && !password.includes('%40')) {
-    const encodedPassword = encodeURIComponent(password);
-    connectionString = `postgresql://${user}:${encodedPassword}@${rest}`;
+// If password contains special characters like @, they must be URL encoded
+function fixConnectionString(url: string): string {
+  try {
+    // Try to parse the URL
+    const urlObj = new URL(url);
+    
+    // If password exists and contains @, encode it
+    if (urlObj.password && urlObj.password.includes('@') && !urlObj.password.includes('%40')) {
+      urlObj.password = encodeURIComponent(urlObj.password);
+      return urlObj.toString();
+    }
+    
+    return url;
+  } catch (e) {
+    // If URL parsing fails, try manual parsing
+    const match = url.match(/^postgresql:\/\/([^:]+):([^@]+)@(.+)$/);
+    if (match) {
+      const [, user, password, rest] = match;
+      if (password.includes('@') && !password.includes('%40')) {
+        const encodedPassword = encodeURIComponent(password);
+        return `postgresql://${user}:${encodedPassword}@${rest}`;
+      }
+    }
+    return url;
   }
 }
+
+const connectionString = fixConnectionString(process.env.DATABASE_URL);
 
 const pool = new Pool({
   connectionString: connectionString,
@@ -29,12 +44,20 @@ const pool = new Pool({
   },
   max: 20,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 20000,
+  connectionTimeoutMillis: 30000, // Increased timeout
 });
 
-// Test connection on startup
+// Test connection
 pool.on('error', (err) => {
-  console.error('Unexpected database pool error:', err);
+  console.error('Database pool error:', err);
+});
+
+// Test connection on module load
+pool.connect().then((client) => {
+  console.log('Database connection successful');
+  client.release();
+}).catch((err) => {
+  console.error('Database connection failed:', err);
 });
 
 export const db = drizzle(pool, { schema });
