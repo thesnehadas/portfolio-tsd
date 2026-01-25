@@ -22,6 +22,12 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // Disable output file tracing to fix Vercel deployment issue
+  experimental: {
+    outputFileTracingExcludes: {
+      '*': [],
+    },
+  },
   turbopack: {
     rules: {
       "*.{jsx,tsx}": {
