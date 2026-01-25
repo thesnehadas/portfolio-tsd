@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { TestimonialsList } from "@/components/admin/testimonials-list";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function TestimonialsPage() {
   const allTestimonials = await db.select().from(testimonials).orderBy(desc(testimonials.createdAt));
 

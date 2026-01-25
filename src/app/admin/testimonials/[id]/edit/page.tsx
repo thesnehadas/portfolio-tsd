@@ -4,6 +4,9 @@ import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { TestimonialForm } from "@/components/admin/testimonial-form";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function EditTestimonialPage({
   params,
 }: {

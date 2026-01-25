@@ -1,10 +1,16 @@
-import { drizzle } from "drizzle-orm/better-sqlite3";
-import Database from "better-sqlite3";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
 import * as schema from "./schema";
 
-// Use environment variable for database path, fallback to sqlite.db
-const dbPath = process.env.DATABASE_URL || "sqlite.db";
-const sqlite = new Database(dbPath);
-export const db = drizzle(sqlite, { schema });
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL environment variable is not set");
+}
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
+});
+
+export const db = drizzle(pool, { schema });
 
 export type Database = typeof db;

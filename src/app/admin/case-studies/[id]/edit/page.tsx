@@ -4,6 +4,9 @@ import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { CaseStudyForm } from "@/components/admin/case-study-form";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function EditCaseStudyPage({
   params,
 }: {

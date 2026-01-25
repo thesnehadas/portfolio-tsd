@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { CaseStudiesList } from "@/components/admin/case-studies-list";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function CaseStudiesPage() {
   const allCaseStudies = await db.select().from(caseStudies).orderBy(desc(caseStudies.createdAt));
 
