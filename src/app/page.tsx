@@ -12,9 +12,9 @@ import Footer from "@/components/sections/footer";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-retro-brown/10 selection:text-retro-brown">
+    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-retro-brown/10 selection:text-retro-brown overflow-x-hidden">
       <Header />
-      <main>
+      <main className="overflow-x-hidden">
         <HeroSection />
         <SocialProofSection />
         <WhatIDo />

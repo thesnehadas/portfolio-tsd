@@ -8,15 +8,18 @@ import React from 'react';
  */
 const Header = () => {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b border-transparent">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-transparent">
       <div className="max-w-5xl mx-auto px-6 md:px-12 lg:px-24 py-6 flex items-center justify-between h-[68px]">
         {/* Logo Section */}
         <a 
           href="/" 
-          className="text-sm font-medium tracking-wide text-[#221f1c] hover:opacity-80 transition-opacity"
-          style={{ fontFamily: '"DM Sans", sans-serif' }}
+          className="flex items-center hover:opacity-80 transition-opacity"
         >
-          snehadas.ai
+          <img 
+            src="/otherlogos/name_logo.gif" 
+            alt="snehadas.ai" 
+            className="h-12 md:h-14 w-auto"
+          />
         </a>
 
           {/* Navigation Section */}
