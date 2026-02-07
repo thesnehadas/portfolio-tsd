@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function BlogPage() {
@@ -30,9 +30,7 @@ export default async function BlogPage() {
           <h1 className="text-3xl font-serif font-semibold text-[#09090b] mb-2">
             Blog Posts
           </h1>
-          <p className="text-[#71717a]">
-            Manage your blog articles and content
-          </p>
+          <p className="text-[#71717a]">Manage your blog articles and content</p>
         </div>
         <Link href="/admin/blog/new">
           <Button className="bg-[#09090b] text-white hover:bg-[#09090b]/90">
@@ -44,10 +42,12 @@ export default async function BlogPage() {
 
       {error && (
         <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p className="text-yellow-800 font-medium mb-2">⚠️ Setup Required</p>
+          <p className="text-yellow-800 font-medium mb-2">Setup Required</p>
           <p className="text-yellow-700 text-sm">{error}</p>
           <p className="text-yellow-700 text-sm mt-2">
-            Please run the SQL migration from <code className="bg-yellow-100 px-1 rounded">drizzle/0000_flashy_tusk.sql</code> in your Supabase SQL Editor.
+            Please run the SQL migration from{" "}
+            <code className="bg-yellow-100 px-1 rounded">drizzle/0000_flashy_tusk.sql</code>{" "}
+            in your Supabase SQL Editor.
           </p>
         </div>
       )}
@@ -71,7 +71,7 @@ export default async function BlogPage() {
                 </tr>
               </thead>
               <tbody>
-                {allPosts.map((post) => (
+                {allPosts.map((post: any) => (
                   <tr key={post.id} className="border-t hover:bg-[#fafafa]">
                     <td className="p-4">
                       <div className="font-medium text-[#09090b]">{post.title}</div>
@@ -81,9 +81,7 @@ export default async function BlogPage() {
                         </div>
                       )}
                     </td>
-                    <td className="p-4 text-sm text-[#71717a] font-mono">
-                      {post.slug}
-                    </td>
+                    <td className="p-4 text-sm text-[#71717a] font-mono">{post.slug}</td>
                     <td className="p-4">
                       <span
                         className={`px-2 py-1 rounded text-xs font-medium ${
@@ -99,24 +97,17 @@ export default async function BlogPage() {
                     </td>
                     <td className="p-4">
                       {post.isFeatured === 1 ? (
-                        <span className="text-green-600">✓</span>
+                        <span className="text-green-600">Yes</span>
                       ) : (
-                        <span className="text-[#71717a]">—</span>
+                        <span className="text-[#71717a]">No</span>
                       )}
                     </td>
                     <td className="p-4 text-sm text-[#71717a]">
                       {(() => {
-                        const date = (post as any).publish_date || (post as any).publishDate;
-                        if (!date) return "—";
-                        try {
-                          const dateObj = date instanceof Date ? date : new Date(date);
-                          if (!isNaN(dateObj.getTime())) {
-                            return dateObj.toLocaleDateString();
-                          }
-                        } catch {
-                          // Ignore errors
-                        }
-                        return "—";
+                        const date = post.publish_date || post.publishDate;
+                        if (!date) return "--";
+                        const dateObj = date instanceof Date ? date : new Date(date);
+                        return isNaN(dateObj.getTime()) ? "--" : dateObj.toLocaleDateString();
                       })()}
                     </td>
                     <td className="p-4">
@@ -131,7 +122,7 @@ export default async function BlogPage() {
               </tbody>
             </table>
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );
