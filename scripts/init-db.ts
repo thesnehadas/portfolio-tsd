@@ -3,6 +3,11 @@ import { Pool } from "pg";
 import * as schema from "../src/lib/db/schema";
 import bcrypt from "bcrypt";
 import { randomUUID } from "crypto";
+import { config } from "dotenv";
+import { resolve } from "path";
+
+// Load .env.local file
+config({ path: resolve(process.cwd(), ".env.local") });
 
 if (!process.env.DATABASE_URL) {
   console.error("❌ DATABASE_URL environment variable is not set");

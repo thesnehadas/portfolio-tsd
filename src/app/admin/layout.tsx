@@ -6,6 +6,7 @@ import {
   FileText, 
   MessageSquare, 
   Building2,
+  BookOpen,
   LogOut 
 } from "lucide-react";
 
@@ -58,6 +59,13 @@ export default async function AdminLayout({
             >
               <Building2 className="w-5 h-5" />
               Social Proof
+            </Link>
+            <Link
+              href="/admin/blog"
+              className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-[#fdfaf3] transition-colors text-[#09090b]"
+            >
+              <BookOpen className="w-5 h-5" />
+              Blog Posts
             </Link>
           </nav>
 
