@@ -8,10 +8,14 @@ import { ArrowUpRight } from 'lucide-react';
  * Incorporates retro window controls, the signal logo icon, serif typography,
  * and an outlined "Read the blog" button.
  */
-const BlogSignalSection = () => {
+interface BlogSignalSectionProps {
+  showButton?: boolean;
+}
+
+const BlogSignalSection = ({ showButton = true }: BlogSignalSectionProps) => {
   return (
     <section 
-      className="py-24 md:py-32 px-6 md:px-12 lg:px-24 bg-[#18181b] text-[#ffffff]"
+      className={`${showButton ? 'py-24 md:py-32' : 'pt-24 md:pt-32 pb-8 md:pb-12'} px-6 md:px-12 lg:px-24 bg-[#18181b] text-[#ffffff]`}
       aria-labelledby="blog-heading"
     >
       <div className="max-w-5xl mx-auto">
@@ -56,15 +60,17 @@ const BlogSignalSection = () => {
           </p>
 
           {/* Outlined Button CTA */}
-          <a 
-            href="/blog" 
-            className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white border border-white/30 bg-transparent rounded-md h-11 px-8 text-white hover:bg-white hover:text-[#18181b] group"
-          >
-            Read the blog
-            <ArrowUpRight 
-              className="ml-2 h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" 
-            />
-          </a>
+          {showButton && (
+            <a 
+              href="/blog" 
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white border border-white/30 bg-transparent rounded-md h-11 px-8 text-white hover:bg-white hover:text-[#18181b] group"
+            >
+              Read the blog
+              <ArrowUpRight 
+                className="ml-2 h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" 
+              />
+            </a>
+          )}
         </div>
       </div>
     </section>

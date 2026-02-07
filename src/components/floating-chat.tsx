@@ -148,10 +148,9 @@ const FloatingChat: React.FC = () => {
             }}
           >
             <div 
-              className="bg-white text-[#09090b] text-xs md:text-sm font-normal px-3 md:px-4 py-2 md:py-2.5 shadow-lg hover:shadow-xl transition-shadow duration-200 relative whitespace-nowrap"
+              className="bg-white text-[#09090b] text-xs md:text-sm font-normal px-3 md:px-4 py-2 md:py-2.5 shadow-lg hover:shadow-xl transition-shadow duration-200 relative whitespace-nowrap border border-border"
               style={{
                 borderRadius: '18px',
-                border: '1px solid #e4e4e7',
                 lineHeight: '1.4',
               }}
             >
@@ -166,9 +165,9 @@ const FloatingChat: React.FC = () => {
                   top: '50%',
                   width: '10px',
                   height: '10px',
-                  background: 'white',
-                  borderTop: '1px solid #e4e4e7',
-                  borderRight: '1px solid #e4e4e7',
+                  background: 'var(--background)',
+                  borderTop: '1px solid var(--border)',
+                  borderRight: '1px solid var(--border)',
                   transform: 'translateY(-50%) rotate(45deg)',
                 }}
               ></div>
@@ -179,7 +178,7 @@ const FloatingChat: React.FC = () => {
             <div className="absolute -inset-1.5 rounded-full bg-gradient-to-br from-[#D4AF37]/30 via-[#09090b]/10 to-[#D4AF37]/20 opacity-60 group-hover:opacity-100 transition-opacity duration-300 blur-md animate-pulse-slow-chat"></div>
             <button
               onClick={handleClick}
-              className="relative w-14 h-14 md:w-16 md:h-16 rounded-full border-2 border-[#e4e4e7] shadow-xl ring-1 ring-[#D4AF37]/20 group-hover:ring-[#D4AF37]/40 transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95 overflow-hidden p-0 bg-transparent"
+              className="relative w-14 h-14 md:w-16 md:h-16 rounded-full border-2 border-border shadow-xl ring-1 ring-[#D4AF37]/20 group-hover:ring-[#D4AF37]/40 transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95 overflow-hidden p-0 bg-transparent"
               style={{ outline: 'none' }}
             >
               <img 

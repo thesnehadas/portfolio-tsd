@@ -62,10 +62,9 @@ const HeroSection: React.FC = () => {
       {/* Name Tag / Breadcrumb */}
       <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out fill-mode-both">
         <div 
-          className="text-sm uppercase mb-6 font-sans flex items-center gap-2"
+          className="text-sm uppercase mb-6 font-sans flex items-center gap-2 text-muted-foreground"
           style={{
             letterSpacing: '0.2em',
-            color: '#71717a', // Derived from computed styles muted-foreground
             fontSize: '14px',
           }}
         >
@@ -82,9 +81,8 @@ const HeroSection: React.FC = () => {
 
       {/* Main Headline */}
       <h1 
-        className="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-[1.1] mb-6 text-balance animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150 ease-out fill-mode-both"
+        className="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-[1.1] mb-6 text-balance animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150 ease-out fill-mode-both text-foreground"
         style={{
-          color: '#09090b', // Primary foreground
           fontWeight: 400,
         }}
       >
@@ -93,10 +91,7 @@ const HeroSection: React.FC = () => {
 
       {/* Subtext */}
       <p 
-        className="text-lg md:text-xl max-w-2xl mb-10 font-sans font-light leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 ease-out fill-mode-both"
-        style={{
-          color: '#71717a', // Muted foreground
-        }}
+        className="text-lg md:text-xl max-w-2xl mb-10 font-sans font-light leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 ease-out fill-mode-both text-muted-foreground"
       >
         AI infrastructure for pipeline generation, sales acceleration, and operational efficiency that drives measurable outcomes.
       </p>
@@ -106,10 +101,8 @@ const HeroSection: React.FC = () => {
         {/* Primary Action */}
         <a 
           href="#contact" 
-          className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 group px-8 h-11 rounded-sm"
+          className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 group px-8 h-11 rounded-sm bg-primary text-primary-foreground hover:opacity-90"
           style={{
-            backgroundColor: '#09090b',
-            color: '#ffffff',
             fontWeight: 500,
             letterSpacing: '0.025em',
           }}
@@ -124,10 +117,8 @@ const HeroSection: React.FC = () => {
         {/* Secondary Action */}
         <a 
           href="#offers" 
-          className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 px-8 h-11 rounded-sm border hover:bg-black/5"
+          className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 px-8 h-11 rounded-sm border border-border text-foreground hover:bg-accent"
           style={{
-            borderColor: 'rgba(9, 9, 11, 0.3)',
-            color: '#09090b',
             fontWeight: 500,
             letterSpacing: '0.025em',
           }}
@@ -141,14 +132,11 @@ const HeroSection: React.FC = () => {
         href={currentOutlet.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="absolute bottom-8 right-6 md:right-12 lg:right-24 flex items-center gap-1.5 text-xs font-sans hover:opacity-80 transition-all duration-500 group"
-        style={{
-          color: '#71717a',
-        }}
+        className="absolute bottom-8 right-6 md:right-12 lg:right-24 flex items-center gap-1.5 text-xs font-sans hover:opacity-80 transition-all duration-500 group text-muted-foreground"
         key={currentIndex}
       >
         <span>Know more about me on</span>
-        <span style={{ color: '#71717a' }}>{currentOutlet.name}</span>
+        <span>{currentOutlet.name}</span>
         <img 
           src={currentOutlet.logo} 
           alt={currentOutlet.name} 
@@ -157,7 +145,6 @@ const HeroSection: React.FC = () => {
         <ArrowUpRight 
           className="h-3 w-3 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" 
           strokeWidth={1.5}
-          style={{ color: '#71717a' }}
         />
       </a>
     </section>
