@@ -195,11 +195,10 @@ export function BlogForm({ initialData, existingTags }: { initialData?: BlogPost
       }
 
       const result = await res.json();
-      router.push("/admin/blog");
-      router.refresh();
+      // Use window.location for reliable redirect
+      window.location.href = "/admin/blog";
     } catch (err: any) {
       setError(err.message || "Something went wrong");
-    } finally {
       setLoading(false);
     }
   };
