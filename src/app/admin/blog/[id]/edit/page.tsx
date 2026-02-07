@@ -49,13 +49,35 @@ export default async function EditBlogPage({
     notFound();
   }
 
-  // Ensure all fields are properly formatted for the form
+  // Map snake_case database fields to camelCase form fields
   const formattedPost = {
-    ...post,
-    // Ensure publishDate is handled correctly
-    publishDate: post.publishDate 
-      ? (typeof post.publishDate === 'string' ? post.publishDate : post.publishDate.toISOString())
+    id: post.id,
+    title: post.title,
+    slug: post.slug,
+    excerpt: post.excerpt || null,
+    metaTitle: (post as any).meta_title || (post as any).metaTitle || null,
+    metaDescription: (post as any).meta_description || (post as any).metaDescription || null,
+    primaryKeyword: (post as any).primary_keyword || (post as any).primaryKeyword || null,
+    secondaryKeywords: (post as any).secondary_keywords || (post as any).secondaryKeywords || null,
+    searchIntent: (post as any).search_intent || (post as any).searchIntent || null,
+    content: post.content,
+    featuredImage: (post as any).featured_image || (post as any).featuredImage || null,
+    featuredImageAlt: (post as any).featured_image_alt || (post as any).featuredImageAlt || null,
+    featuredImageCaption: (post as any).featured_image_caption || (post as any).featuredImageCaption || null,
+    category: post.category || null,
+    tags: post.tags || null,
+    status: post.status,
+    isFeatured: post.isFeatured,
+    // Handle publishDate - could be Date object, string, or null
+    publishDate: (post as any).publish_date || (post as any).publishDate 
+      ? (() => {
+          const date = (post as any).publish_date || (post as any).publishDate;
+          if (typeof date === 'string') return date;
+          if (date instanceof Date) return date.toISOString();
+          return null;
+        })()
       : null,
+    schemaType: (post as any).schema_type || (post as any).schemaType || null,
   };
 
   return (
