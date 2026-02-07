@@ -1,22 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth } from "@/lib/auth-helpers";
+import { requireAuthAPI } from "@/lib/auth-helpers";
 import { db } from "@/lib/db";
 import { blogTags } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function GET() {
   try {
-    await requireAuth();
+    await requireAuthAPI();
     const all = await db.select().from(blogTags).orderBy(blogTags.name);
     return NextResponse.json(all);
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Error fetching tags:", error);
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    await requireAuth();
+    await requireAuthAPI();
     const body = await request.json();
 
     if (!body.name || !body.name.trim()) {
@@ -46,6 +47,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(newTag[0]);
   } catch (error: any) {
+    if (error.message === "Unauthorized") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     console.error("Error creating tag:", error);
     return NextResponse.json(
       { error: error.message || "Failed to create tag" },

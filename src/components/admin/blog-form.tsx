@@ -136,11 +136,17 @@ export function BlogForm({ initialData, existingTags }: { initialData?: BlogPost
         setSelectedTagIds([...selectedTagIds, newTag.id]);
         setNewTagName("");
       } else {
-        throw new Error("Failed to create tag");
+        const errorData = await res.json().catch(() => ({}));
+        if (res.status === 401) {
+          alert("You are not authorized. Please log in again.");
+          window.location.href = "/admin/login";
+        } else {
+          throw new Error(errorData.error || "Failed to create tag");
+        }
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error creating tag:", err);
-      alert("Failed to create tag. Please try again.");
+      alert(err.message || "Failed to create tag. Please try again.");
     }
   };
 
@@ -177,10 +183,18 @@ export function BlogForm({ initialData, existingTags }: { initialData?: BlogPost
       });
 
       if (!res.ok) {
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 401) {
+          setError("You are not authorized. Please log in again.");
+          setTimeout(() => {
+            window.location.href = "/admin/login";
+          }, 2000);
+          return;
+        }
         throw new Error(data.error || "Failed to save");
       }
 
+      const result = await res.json();
       router.push("/admin/blog");
       router.refresh();
     } catch (err: any) {

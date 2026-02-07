@@ -1,22 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth } from "@/lib/auth-helpers";
+import { requireAuthAPI } from "@/lib/auth-helpers";
 import { db } from "@/lib/db";
 import { blogPosts } from "@/lib/db/schema";
 import { sql } from "drizzle-orm";
 
 export async function GET() {
   try {
-    await requireAuth();
+    await requireAuthAPI();
     const all = await db.select().from(blogPosts).orderBy(blogPosts.createdAt);
     return NextResponse.json(all);
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Error fetching blog posts:", error);
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    await requireAuth();
+    await requireAuthAPI();
     const body = await request.json();
 
     // Validate required fields
@@ -67,6 +68,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(newPost[0]);
   } catch (error: any) {
+    if (error.message === "Unauthorized") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     console.error("Error creating blog post:", error);
     return NextResponse.json(
       { error: error.message || "Failed to create blog post" },

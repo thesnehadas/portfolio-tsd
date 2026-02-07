@@ -12,3 +12,12 @@ export async function requireAuth() {
     redirect("/admin/login");
   }
 }
+
+// For API routes - throws error instead of redirecting
+export async function requireAuthAPI() {
+  const session = await getAuthSession();
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+  return session;
+}

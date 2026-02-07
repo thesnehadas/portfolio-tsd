@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth } from "@/lib/auth-helpers";
+import { requireAuthAPI } from "@/lib/auth-helpers";
 import { db } from "@/lib/db";
 import { blogPosts } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
@@ -10,7 +10,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireAuth();
+    await requireAuthAPI();
     const { id } = await params;
     const [post] = await db
       .select()
@@ -23,7 +23,8 @@ export async function GET(
     }
 
     return NextResponse.json(post);
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Error fetching blog post:", error);
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 }
@@ -33,7 +34,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireAuth();
+    await requireAuthAPI();
     const { id } = await params;
     const body = await request.json();
 
@@ -91,6 +92,9 @@ export async function PUT(
 
     return NextResponse.json(updated[0]);
   } catch (error: any) {
+    if (error.message === "Unauthorized") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     console.error("Error updating blog post:", error);
     return NextResponse.json(
       { error: error.message || "Failed to update blog post" },
@@ -104,13 +108,16 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireAuth();
+    await requireAuthAPI();
     const { id } = await params;
 
     await db.delete(blogPosts).where(eq(blogPosts.id, id));
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
+    if (error.message === "Unauthorized") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     console.error("Error deleting blog post:", error);
     return NextResponse.json(
       { error: error.message || "Failed to delete blog post" },
