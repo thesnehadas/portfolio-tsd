@@ -204,7 +204,10 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
             </div>
           </div>
         </div>
-        <ContactSection />
+        {/* Contact Section with matching blog background */}
+        <div className="bg-[#18181b]">
+          <ContactSection />
+        </div>
       </main>
       <Footer />
     </div>
