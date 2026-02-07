@@ -33,43 +33,49 @@ This is an automated message from your website.
 
     // Send email using Resend (if configured) or log for manual sending
     const RESEND_API_KEY = process.env.RESEND_API_KEY;
+    const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "sneha@importai.in";
     
-    if (RESEND_API_KEY) {
-      // Use Resend API to send email
-      const resendResponse = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${RESEND_API_KEY}`,
-        },
-        body: JSON.stringify({
-          from: process.env.RESEND_FROM_EMAIL || "website@thesnehadas.com",
-          to: "snehadas.iitr@gmail.com",
-          subject: subject,
-          text: emailBody,
-        }),
-      });
-
-      if (!resendResponse.ok) {
-        const errorData = await resendResponse.json();
-        throw new Error(errorData.message || "Failed to send email");
-      }
-    } else {
-      // Log the request if email service is not configured
-      // You can set up Resend API key in environment variables for production
-      console.log("System Access Request (Email service not configured):", {
-        systemTitle,
-        systemDescription,
-        name,
-        email,
-        to: "snehadas.iitr@gmail.com",
-        subject,
-        body: emailBody,
-      });
-      
-      // In production, you should set up RESEND_API_KEY in your environment variables
-      // For now, we'll still return success so the form works
+    if (!RESEND_API_KEY) {
+      console.error("RESEND_API_KEY is not set in environment variables");
+      return NextResponse.json(
+        { error: "Email service not configured. Please set RESEND_API_KEY." },
+        { status: 500 }
+      );
     }
+    
+    // Use Resend API to send email
+    const resendResponse = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: FROM_EMAIL,
+        to: "snehadas.iitr@gmail.com",
+        subject: subject,
+        text: emailBody,
+      }),
+    });
+
+    const responseData = await resendResponse.json();
+
+    if (!resendResponse.ok) {
+      console.error("Resend API Error:", {
+        status: resendResponse.status,
+        statusText: resendResponse.statusText,
+        error: responseData,
+      });
+      throw new Error(responseData.message || `Failed to send email: ${resendResponse.statusText}`);
+    }
+
+    // Log successful email send
+    console.log("Email sent successfully:", {
+      id: responseData.id,
+      from: FROM_EMAIL,
+      to: "snehadas.iitr@gmail.com",
+      subject: subject,
+    });
 
     return NextResponse.json(
       { 

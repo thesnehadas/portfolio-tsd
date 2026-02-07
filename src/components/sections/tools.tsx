@@ -148,9 +148,18 @@ const ToolsSection: React.FC = () => {
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to submit request");
+        const data = await res.json().catch(() => ({}));
+        const errorMessage = data.error || `Server error: ${res.status} ${res.statusText}`;
+        console.error("API Error:", {
+          status: res.status,
+          statusText: res.statusText,
+          error: data,
+        });
+        throw new Error(errorMessage);
       }
+
+      const result = await res.json();
+      console.log("Request submitted successfully:", result);
 
       setSuccess(true);
       setTimeout(() => {
@@ -158,6 +167,7 @@ const ToolsSection: React.FC = () => {
         setSuccess(false);
       }, 2000);
     } catch (err: any) {
+      console.error("Form submission error:", err);
       setError(err.message || "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
