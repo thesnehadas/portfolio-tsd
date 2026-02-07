@@ -49,17 +49,25 @@ export default async function EditBlogPage({
     notFound();
   }
 
-  // Map snake_case database fields to camelCase form fields
-  // Helper function to safely convert date to string
+  // Helper function to safely convert ANY date-like value to ISO string or null
+  // This is critical - React cannot serialize Date objects to client components
   const formatDateToString = (date: any): string | null => {
     if (!date) return null;
-    if (typeof date === 'string') return date;
+    if (typeof date === 'string') {
+      // If it's already a string, validate it's a valid date string
+      const testDate = new Date(date);
+      if (!isNaN(testDate.getTime())) {
+        return date;
+      }
+      return null;
+    }
     if (date instanceof Date) {
       if (!isNaN(date.getTime())) {
         return date.toISOString();
       }
+      return null;
     }
-    // Try to parse as date
+    // Try to parse as date (handles timestamps, date-like objects, etc.)
     try {
       const parsed = new Date(date);
       if (!isNaN(parsed.getTime())) {
@@ -71,27 +79,33 @@ export default async function EditBlogPage({
     return null;
   };
 
+  // Convert the raw post object to a plain object with all dates as strings
+  // This ensures React can serialize it properly to the client component
+  const postAny = post as any;
+  
   const formattedPost = {
     id: post.id,
-    title: post.title,
-    slug: post.slug,
+    title: post.title || "",
+    slug: post.slug || "",
     excerpt: post.excerpt || null,
-    metaTitle: (post as any).meta_title || (post as any).metaTitle || null,
-    metaDescription: (post as any).meta_description || (post as any).metaDescription || null,
-    primaryKeyword: (post as any).primary_keyword || (post as any).primaryKeyword || null,
-    secondaryKeywords: (post as any).secondary_keywords || (post as any).secondaryKeywords || null,
-    searchIntent: (post as any).search_intent || (post as any).searchIntent || null,
-    content: post.content,
-    featuredImage: (post as any).featured_image || (post as any).featuredImage || null,
-    featuredImageAlt: (post as any).featured_image_alt || (post as any).featuredImageAlt || null,
-    featuredImageCaption: (post as any).featured_image_caption || (post as any).featuredImageCaption || null,
+    // Map all snake_case fields to camelCase, handling both formats
+    metaTitle: postAny.meta_title || postAny.metaTitle || null,
+    metaDescription: postAny.meta_description || postAny.metaDescription || null,
+    primaryKeyword: postAny.primary_keyword || postAny.primaryKeyword || null,
+    secondaryKeywords: postAny.secondary_keywords || postAny.secondaryKeywords || null,
+    searchIntent: postAny.search_intent || postAny.searchIntent || null,
+    content: post.content || "",
+    featuredImage: postAny.featured_image || postAny.featuredImage || null,
+    featuredImageAlt: postAny.featured_image_alt || postAny.featuredImageAlt || null,
+    featuredImageCaption: postAny.featured_image_caption || postAny.featuredImageCaption || null,
     category: post.category || null,
     tags: post.tags || null,
-    status: post.status,
-    isFeatured: post.isFeatured,
-    // Handle publishDate - ensure it's always a string or null, never a Date object
-    publishDate: formatDateToString((post as any).publish_date || (post as any).publishDate),
-    schemaType: (post as any).schema_type || (post as any).schemaType || null,
+    status: post.status || "draft",
+    // Handle isFeatured - could be is_featured (snake_case) or isFeatured (camelCase)
+    isFeatured: postAny.is_featured ?? postAny.isFeatured ?? 0,
+    // CRITICAL: Convert publishDate to string - React cannot serialize Date objects
+    publishDate: formatDateToString(postAny.publish_date || postAny.publishDate),
+    schemaType: postAny.schema_type || postAny.schemaType || null,
   };
 
   return (

@@ -105,9 +105,19 @@ export default async function BlogPage() {
                       )}
                     </td>
                     <td className="p-4 text-sm text-[#71717a]">
-                      {post.publishDate
-                        ? new Date(post.publishDate).toLocaleDateString()
-                        : "—"}
+                      {(() => {
+                        const date = (post as any).publish_date || (post as any).publishDate;
+                        if (!date) return "—";
+                        try {
+                          const dateObj = date instanceof Date ? date : new Date(date);
+                          if (!isNaN(dateObj.getTime())) {
+                            return dateObj.toLocaleDateString();
+                          }
+                        } catch {
+                          // Ignore errors
+                        }
+                        return "—";
+                      })()}
                     </td>
                     <td className="p-4">
                       <Link href={`/admin/blog/${post.id}/edit`}>

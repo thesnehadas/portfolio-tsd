@@ -69,22 +69,34 @@ export function BlogForm({ initialData, existingTags }: { initialData?: BlogPost
 
   const [formData, setFormData] = useState(() => {
     // Format publishDate properly with error handling
+    // initialData.publishDate should already be a string (converted in edit page)
+    // But we'll handle all cases to be safe
     let publishDateStr = "";
     if (initialData?.publishDate) {
       try {
-        let date: Date;
+        // If it's already a string in YYYY-MM-DD format, use it directly
         if (typeof initialData.publishDate === 'string') {
-          date = new Date(initialData.publishDate);
+          // Check if it's already in the correct format (YYYY-MM-DD)
+          if (/^\d{4}-\d{2}-\d{2}/.test(initialData.publishDate)) {
+            publishDateStr = initialData.publishDate.split('T')[0]; // Get date part only
+          } else {
+            // Try to parse and format it
+            const date = new Date(initialData.publishDate);
+            if (!isNaN(date.getTime())) {
+              publishDateStr = date.toISOString().split('T')[0];
+            }
+          }
         } else if (initialData.publishDate instanceof Date) {
-          date = initialData.publishDate;
+          // Should not happen if edit page is working correctly, but handle it
+          if (!isNaN(initialData.publishDate.getTime())) {
+            publishDateStr = initialData.publishDate.toISOString().split('T')[0];
+          }
         } else {
           // Handle timestamp or other formats
-          date = new Date(initialData.publishDate as any);
-        }
-        
-        // Check if date is valid
-        if (!isNaN(date.getTime())) {
-          publishDateStr = date.toISOString().split('T')[0];
+          const date = new Date(initialData.publishDate as any);
+          if (!isNaN(date.getTime())) {
+            publishDateStr = date.toISOString().split('T')[0];
+          }
         }
       } catch (err) {
         console.error("Error parsing publishDate:", err);
