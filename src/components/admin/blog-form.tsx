@@ -68,13 +68,28 @@ export function BlogForm({ initialData, existingTags }: { initialData?: BlogPost
   const [newTagName, setNewTagName] = useState("");
 
   const [formData, setFormData] = useState(() => {
-    // Format publishDate properly
+    // Format publishDate properly with error handling
     let publishDateStr = "";
     if (initialData?.publishDate) {
-      const date = typeof initialData.publishDate === 'string' 
-        ? new Date(initialData.publishDate) 
-        : initialData.publishDate;
-      publishDateStr = date.toISOString().split('T')[0];
+      try {
+        let date: Date;
+        if (typeof initialData.publishDate === 'string') {
+          date = new Date(initialData.publishDate);
+        } else if (initialData.publishDate instanceof Date) {
+          date = initialData.publishDate;
+        } else {
+          // Handle timestamp or other formats
+          date = new Date(initialData.publishDate as any);
+        }
+        
+        // Check if date is valid
+        if (!isNaN(date.getTime())) {
+          publishDateStr = date.toISOString().split('T')[0];
+        }
+      } catch (err) {
+        console.error("Error parsing publishDate:", err);
+        // Leave publishDateStr as empty string if parsing fails
+      }
     }
 
     return {
