@@ -206,7 +206,9 @@ export function BlogForm({ initialData, existingTags }: { initialData?: BlogPost
       // Use window.location for reliable redirect
       window.location.href = "/admin/blog";
     } catch (err: any) {
+      console.error("Error submitting form:", err);
       setError(err.message || "Something went wrong");
+    } finally {
       setLoading(false);
     }
   };
