@@ -9,7 +9,19 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function BlogPage() {
-  const allPosts = await db.select().from(blogPosts).orderBy(desc(blogPosts.createdAt));
+  let allPosts = [];
+  let error = null;
+
+  try {
+    allPosts = await db.select().from(blogPosts).orderBy(desc(blogPosts.createdAt));
+  } catch (err: any) {
+    console.error("Error fetching blog posts:", err);
+    error = err.message || "Failed to load blog posts";
+    // If table doesn't exist, show helpful message
+    if (err.message?.includes("does not exist") || err.message?.includes("relation") || err.code === "42P01") {
+      error = "Database tables not set up. Please run migrations in Supabase.";
+    }
+  }
 
   return (
     <div>
@@ -30,12 +42,22 @@ export default async function BlogPage() {
         </Link>
       </div>
 
+      {error && (
+        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p className="text-yellow-800 font-medium mb-2">⚠️ Setup Required</p>
+          <p className="text-yellow-700 text-sm">{error}</p>
+          <p className="text-yellow-700 text-sm mt-2">
+            Please run the SQL migration from <code className="bg-yellow-100 px-1 rounded">drizzle/0000_flashy_tusk.sql</code> in your Supabase SQL Editor.
+          </p>
+        </div>
+      )}
+
       <div className="space-y-4">
-        {allPosts.length === 0 ? (
+        {!error && allPosts.length === 0 ? (
           <div className="text-center py-12 text-[#71717a]">
             <p>No blog posts yet. Create your first one!</p>
           </div>
-        ) : (
+        ) : !error ? (
           <div className="border rounded-lg overflow-hidden">
             <table className="w-full">
               <thead className="bg-[#f4f4f5]">
