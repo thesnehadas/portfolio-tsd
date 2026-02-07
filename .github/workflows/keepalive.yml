@@ -1,0 +1,41 @@
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    # Run every 6 days at 12:00 UTC to prevent auto-pause (Supabase pauses after 7 days)
+    # Using cron: minute hour day month day-of-week
+    - cron: '0 12 */6 * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Keep-Alive Endpoint
+        env:
+          # Set this in GitHub Secrets: Settings > Secrets and variables > Actions
+          # Use your production URL (e.g., https://your-app.vercel.app or your custom domain)
+          DEPLOYMENT_URL: ${{ secrets.DEPLOYMENT_URL || 'https://your-domain.com' }}
+        run: |
+          if [ "$DEPLOYMENT_URL" = "https://your-domain.com" ]; then
+            echo "⚠️ WARNING: DEPLOYMENT_URL not set in GitHub Secrets!"
+            echo "Please set DEPLOYMENT_URL secret in: Settings > Secrets and variables > Actions"
+            echo "Using default URL for now..."
+          fi
+          
+          echo "Pinging keep-alive endpoint at: $DEPLOYMENT_URL/api/keepalive"
+          
+          # Make the keep-alive request with timeout
+          response=$(curl -s -w "\n%{http_code}" --max-time 30 "$DEPLOYMENT_URL/api/keepalive" || echo -e "\n000")
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+          
+          if [ "$http_code" -eq 200 ]; then
+            echo "✅ Keep-alive successful"
+            echo "Response: $body"
+          else
+            echo "⚠️ Keep-alive returned status code: $http_code"
+            echo "Response: $body"
+            # Don't fail the workflow - we want it to continue even if there's a temporary issue
+            exit 0
+          fi
