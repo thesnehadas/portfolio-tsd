@@ -4,9 +4,9 @@ import { db } from "@/lib/db";
 import { blogPosts } from "@/lib/db/schema";
 import { sql } from "drizzle-orm";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    await requireAuthAPI();
+    await requireAuthAPI(request);
     const all = await db.select().from(blogPosts).orderBy(blogPosts.createdAt);
     return NextResponse.json(all);
   } catch (error: any) {
@@ -17,7 +17,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    await requireAuthAPI();
+    await requireAuthAPI(request);
     const body = await request.json();
 
     // Validate required fields

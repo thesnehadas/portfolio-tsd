@@ -4,9 +4,9 @@ import { db } from "@/lib/db";
 import { blogTags } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    await requireAuthAPI();
+    await requireAuthAPI(request);
     const all = await db.select().from(blogTags).orderBy(blogTags.name);
     return NextResponse.json(all);
   } catch (error: any) {
@@ -17,7 +17,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    await requireAuthAPI();
+    await requireAuthAPI(request);
     const body = await request.json();
 
     if (!body.name || !body.name.trim()) {

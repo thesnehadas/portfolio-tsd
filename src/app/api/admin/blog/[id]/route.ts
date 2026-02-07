@@ -10,7 +10,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireAuthAPI();
+    await requireAuthAPI(request);
     const { id } = await params;
     const [post] = await db
       .select()
@@ -34,7 +34,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireAuthAPI();
+    await requireAuthAPI(request);
     const { id } = await params;
     const body = await request.json();
 
@@ -108,7 +108,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireAuthAPI();
+    await requireAuthAPI(request);
     const { id } = await params;
 
     await db.delete(blogPosts).where(eq(blogPosts.id, id));
