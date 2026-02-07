@@ -50,6 +50,27 @@ export default async function EditBlogPage({
   }
 
   // Map snake_case database fields to camelCase form fields
+  // Helper function to safely convert date to string
+  const formatDateToString = (date: any): string | null => {
+    if (!date) return null;
+    if (typeof date === 'string') return date;
+    if (date instanceof Date) {
+      if (!isNaN(date.getTime())) {
+        return date.toISOString();
+      }
+    }
+    // Try to parse as date
+    try {
+      const parsed = new Date(date);
+      if (!isNaN(parsed.getTime())) {
+        return parsed.toISOString();
+      }
+    } catch {
+      // Ignore parsing errors
+    }
+    return null;
+  };
+
   const formattedPost = {
     id: post.id,
     title: post.title,
@@ -68,15 +89,8 @@ export default async function EditBlogPage({
     tags: post.tags || null,
     status: post.status,
     isFeatured: post.isFeatured,
-    // Handle publishDate - could be Date object, string, or null
-    publishDate: (post as any).publish_date || (post as any).publishDate 
-      ? (() => {
-          const date = (post as any).publish_date || (post as any).publishDate;
-          if (typeof date === 'string') return date;
-          if (date instanceof Date) return date.toISOString();
-          return null;
-        })()
-      : null,
+    // Handle publishDate - ensure it's always a string or null, never a Date object
+    publishDate: formatDateToString((post as any).publish_date || (post as any).publishDate),
     schemaType: (post as any).schema_type || (post as any).schemaType || null,
   };
 
