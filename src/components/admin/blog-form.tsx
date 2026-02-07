@@ -67,24 +67,35 @@ export function BlogForm({ initialData, existingTags }: { initialData?: BlogPost
   });
   const [newTagName, setNewTagName] = useState("");
 
-  const [formData, setFormData] = useState({
-    title: initialData?.title || "",
-    slug: initialData?.slug || "",
-    excerpt: initialData?.excerpt || "",
-    metaTitle: initialData?.metaTitle || "",
-    metaDescription: initialData?.metaDescription || "",
-    primaryKeyword: initialData?.primaryKeyword || "",
-    secondaryKeywords: initialData?.secondaryKeywords || "",
-    searchIntent: initialData?.searchIntent || "",
-    content: initialData?.content || "",
-    featuredImage: initialData?.featuredImage || "",
-    featuredImageAlt: initialData?.featuredImageAlt || "",
-    featuredImageCaption: initialData?.featuredImageCaption || "",
-    category: initialData?.category || "",
-    status: initialData?.status || "draft",
-    isFeatured: initialData?.isFeatured === 1,
-    publishDate: initialData?.publishDate ? initialData.publishDate.split('T')[0] : "",
-    schemaType: initialData?.schemaType || "",
+  const [formData, setFormData] = useState(() => {
+    // Format publishDate properly
+    let publishDateStr = "";
+    if (initialData?.publishDate) {
+      const date = typeof initialData.publishDate === 'string' 
+        ? new Date(initialData.publishDate) 
+        : initialData.publishDate;
+      publishDateStr = date.toISOString().split('T')[0];
+    }
+
+    return {
+      title: initialData?.title || "",
+      slug: initialData?.slug || "",
+      excerpt: initialData?.excerpt || "",
+      metaTitle: initialData?.metaTitle || "",
+      metaDescription: initialData?.metaDescription || "",
+      primaryKeyword: initialData?.primaryKeyword || "",
+      secondaryKeywords: initialData?.secondaryKeywords || "",
+      searchIntent: initialData?.searchIntent || "",
+      content: initialData?.content || "",
+      featuredImage: initialData?.featuredImage || "",
+      featuredImageAlt: initialData?.featuredImageAlt || "",
+      featuredImageCaption: initialData?.featuredImageCaption || "",
+      category: initialData?.category || "",
+      status: initialData?.status || "draft",
+      isFeatured: initialData?.isFeatured === 1,
+      publishDate: publishDateStr,
+      schemaType: initialData?.schemaType || "",
+    };
   });
 
   // Auto-generate slug from title
