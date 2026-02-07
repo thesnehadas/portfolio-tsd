@@ -33,7 +33,12 @@ export default async function NewBlogPage() {
           </p>
         </div>
       )}
-      <BlogForm existingTags={tags} />
+      <BlogForm
+        existingTags={(tags as Array<{ id: string; name: string }>).map((tag: any) => ({
+          id: String(tag.id),
+          name: String(tag.name),
+        }))}
+      />
     </div>
   );
 }

@@ -49,6 +49,12 @@ export default async function EditBlogPage({
     notFound();
   }
 
+  // Strip non-serializable fields from tags (e.g., createdAt Date objects)
+  const safeTags = (tags as Array<{ id: string; name: string }>).map((tag: any) => ({
+    id: String(tag.id),
+    name: String(tag.name),
+  }));
+
   // CRITICAL: Serialize the entire post object to convert ALL Date objects to ISO strings
   // This ensures React can serialize it properly to the client component
   // JSON.parse(JSON.stringify()) converts Date objects to ISO string format
@@ -102,7 +108,7 @@ export default async function EditBlogPage({
       <h1 className="text-3xl font-serif font-semibold text-[#09090b] mb-8">
         Edit Blog Post
       </h1>
-      <BlogForm initialData={formattedPost} existingTags={tags} />
+      <BlogForm initialData={formattedPost} existingTags={safeTags} />
     </div>
   );
 }
