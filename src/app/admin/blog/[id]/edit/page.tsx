@@ -49,12 +49,21 @@ export default async function EditBlogPage({
     notFound();
   }
 
+  // Ensure all fields are properly formatted for the form
+  const formattedPost = {
+    ...post,
+    // Ensure publishDate is handled correctly
+    publishDate: post.publishDate 
+      ? (typeof post.publishDate === 'string' ? post.publishDate : post.publishDate.toISOString())
+      : null,
+  };
+
   return (
     <div>
       <h1 className="text-3xl font-serif font-semibold text-[#09090b] mb-8">
         Edit Blog Post
       </h1>
-      <BlogForm initialData={post} existingTags={tags} />
+      <BlogForm initialData={formattedPost} existingTags={tags} />
     </div>
   );
 }
