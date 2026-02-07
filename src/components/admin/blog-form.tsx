@@ -69,33 +69,46 @@ export function BlogForm({ initialData, existingTags }: { initialData?: BlogPost
 
   const [formData, setFormData] = useState(() => {
     // Format publishDate properly with error handling
-    // initialData.publishDate should already be a string (converted in edit page)
-    // But we'll handle all cases to be safe
+    // initialData.publishDate should already be a YYYY-MM-DD string (converted in edit page)
+    // But we'll handle all cases to be safe and NEVER call .split() on a non-string
     let publishDateStr = "";
     if (initialData?.publishDate) {
       try {
-        // If it's already a string in YYYY-MM-DD format, use it directly
+        // ONLY call .split() if it's definitely a string
         if (typeof initialData.publishDate === 'string') {
           // Check if it's already in the correct format (YYYY-MM-DD)
           if (/^\d{4}-\d{2}-\d{2}/.test(initialData.publishDate)) {
-            publishDateStr = initialData.publishDate.split('T')[0]; // Get date part only
+            // It's already in YYYY-MM-DD format, use it directly
+            publishDateStr = initialData.publishDate;
+          } else if (initialData.publishDate.includes('T')) {
+            // It's an ISO string, extract the date part
+            publishDateStr = initialData.publishDate.split('T')[0];
           } else {
             // Try to parse and format it
             const date = new Date(initialData.publishDate);
             if (!isNaN(date.getTime())) {
-              publishDateStr = date.toISOString().split('T')[0];
+              const year = date.getFullYear();
+              const month = String(date.getMonth() + 1).padStart(2, '0');
+              const day = String(date.getDate()).padStart(2, '0');
+              publishDateStr = `${year}-${month}-${day}`;
             }
           }
         } else if (initialData.publishDate instanceof Date) {
-          // Should not happen if edit page is working correctly, but handle it
+          // Should not happen if edit page is working correctly, but handle it safely
           if (!isNaN(initialData.publishDate.getTime())) {
-            publishDateStr = initialData.publishDate.toISOString().split('T')[0];
+            const year = initialData.publishDate.getFullYear();
+            const month = String(initialData.publishDate.getMonth() + 1).padStart(2, '0');
+            const day = String(initialData.publishDate.getDate()).padStart(2, '0');
+            publishDateStr = `${year}-${month}-${day}`;
           }
         } else {
-          // Handle timestamp or other formats
+          // Handle timestamp or other formats - convert to Date first, then format
           const date = new Date(initialData.publishDate as any);
           if (!isNaN(date.getTime())) {
-            publishDateStr = date.toISOString().split('T')[0];
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            publishDateStr = `${year}-${month}-${day}`;
           }
         }
       } catch (err) {

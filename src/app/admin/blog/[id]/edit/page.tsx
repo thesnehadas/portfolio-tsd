@@ -49,33 +49,42 @@ export default async function EditBlogPage({
     notFound();
   }
 
-  // Helper function to safely convert ANY date-like value to ISO string or null
+  // Helper function to safely convert ANY date-like value to YYYY-MM-DD string or null
   // This is critical - React cannot serialize Date objects to client components
-  const formatDateToString = (date: any): string | null => {
+  // Returns date in YYYY-MM-DD format for HTML date inputs
+  const formatDateToDateString = (date: any): string | null => {
     if (!date) return null;
+    
+    let dateObj: Date | null = null;
+    
     if (typeof date === 'string') {
-      // If it's already a string, validate it's a valid date string
-      const testDate = new Date(date);
-      if (!isNaN(testDate.getTime())) {
-        return date;
+      // If it's already a string, try to parse it
+      dateObj = new Date(date);
+      if (isNaN(dateObj.getTime())) {
+        return null;
       }
-      return null;
-    }
-    if (date instanceof Date) {
-      if (!isNaN(date.getTime())) {
-        return date.toISOString();
+    } else if (date instanceof Date) {
+      dateObj = date;
+    } else {
+      // Try to parse as date (handles timestamps, date-like objects, etc.)
+      try {
+        dateObj = new Date(date);
+        if (isNaN(dateObj.getTime())) {
+          return null;
+        }
+      } catch {
+        return null;
       }
-      return null;
     }
-    // Try to parse as date (handles timestamps, date-like objects, etc.)
-    try {
-      const parsed = new Date(date);
-      if (!isNaN(parsed.getTime())) {
-        return parsed.toISOString();
-      }
-    } catch {
-      // Ignore parsing errors
+    
+    // Convert to YYYY-MM-DD format for HTML date input
+    if (dateObj && !isNaN(dateObj.getTime())) {
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
     }
+    
     return null;
   };
 
@@ -83,29 +92,33 @@ export default async function EditBlogPage({
   // This ensures React can serialize it properly to the client component
   const postAny = post as any;
   
+  // Get the publish date and convert it IMMEDIATELY
+  const publishDateValue = postAny.publish_date || postAny.publishDate;
+  const publishDateString = formatDateToDateString(publishDateValue);
+  
   const formattedPost = {
-    id: post.id,
-    title: post.title || "",
-    slug: post.slug || "",
-    excerpt: post.excerpt || null,
+    id: String(post.id || ""),
+    title: String(post.title || ""),
+    slug: String(post.slug || ""),
+    excerpt: post.excerpt ? String(post.excerpt) : null,
     // Map all snake_case fields to camelCase, handling both formats
-    metaTitle: postAny.meta_title || postAny.metaTitle || null,
-    metaDescription: postAny.meta_description || postAny.metaDescription || null,
-    primaryKeyword: postAny.primary_keyword || postAny.primaryKeyword || null,
-    secondaryKeywords: postAny.secondary_keywords || postAny.secondaryKeywords || null,
-    searchIntent: postAny.search_intent || postAny.searchIntent || null,
-    content: post.content || "",
-    featuredImage: postAny.featured_image || postAny.featuredImage || null,
-    featuredImageAlt: postAny.featured_image_alt || postAny.featuredImageAlt || null,
-    featuredImageCaption: postAny.featured_image_caption || postAny.featuredImageCaption || null,
-    category: post.category || null,
-    tags: post.tags || null,
-    status: post.status || "draft",
+    metaTitle: (postAny.meta_title || postAny.metaTitle) ? String(postAny.meta_title || postAny.metaTitle) : null,
+    metaDescription: (postAny.meta_description || postAny.metaDescription) ? String(postAny.meta_description || postAny.metaDescription) : null,
+    primaryKeyword: (postAny.primary_keyword || postAny.primaryKeyword) ? String(postAny.primary_keyword || postAny.primaryKeyword) : null,
+    secondaryKeywords: (postAny.secondary_keywords || postAny.secondaryKeywords) ? String(postAny.secondary_keywords || postAny.secondaryKeywords) : null,
+    searchIntent: (postAny.search_intent || postAny.searchIntent) ? String(postAny.search_intent || postAny.searchIntent) : null,
+    content: String(post.content || ""),
+    featuredImage: (postAny.featured_image || postAny.featuredImage) ? String(postAny.featured_image || postAny.featuredImage) : null,
+    featuredImageAlt: (postAny.featured_image_alt || postAny.featuredImageAlt) ? String(postAny.featured_image_alt || postAny.featuredImageAlt) : null,
+    featuredImageCaption: (postAny.featured_image_caption || postAny.featuredImageCaption) ? String(postAny.featured_image_caption || postAny.featuredImageCaption) : null,
+    category: post.category ? String(post.category) : null,
+    tags: post.tags ? String(post.tags) : null,
+    status: String(post.status || "draft"),
     // Handle isFeatured - could be is_featured (snake_case) or isFeatured (camelCase)
-    isFeatured: postAny.is_featured ?? postAny.isFeatured ?? 0,
-    // CRITICAL: Convert publishDate to string - React cannot serialize Date objects
-    publishDate: formatDateToString(postAny.publish_date || postAny.publishDate),
-    schemaType: postAny.schema_type || postAny.schemaType || null,
+    isFeatured: Number(postAny.is_featured ?? postAny.isFeatured ?? 0),
+    // CRITICAL: Convert publishDate to YYYY-MM-DD string format - React cannot serialize Date objects
+    publishDate: publishDateString,
+    schemaType: (postAny.schema_type || postAny.schemaType) ? String(postAny.schema_type || postAny.schemaType) : null,
   };
 
   return (
