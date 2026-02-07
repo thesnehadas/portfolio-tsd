@@ -15,7 +15,7 @@ interface BlogSignalSectionProps {
 const BlogSignalSection = ({ showButton = true }: BlogSignalSectionProps) => {
   return (
     <section 
-      className={`${showButton ? 'py-24 md:py-32' : 'pt-24 md:pt-32 pb-8 md:pb-12'} px-6 md:px-12 lg:px-24 bg-[#18181b] text-[#ffffff]`}
+      className={`${showButton ? 'py-12 md:py-16' : 'pt-12 md:pt-16 pb-8 md:pb-12'} px-6 md:px-12 lg:px-24 bg-[#18181b] text-[#ffffff]`}
       aria-labelledby="blog-heading"
     >
       <div className="max-w-5xl mx-auto">

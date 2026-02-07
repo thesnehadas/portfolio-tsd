@@ -1,8 +1,8 @@
-import Header from "@/components/sections/header";
 import BlogSignalSection from "@/components/sections/blog-signal";
 import ContactSection from "@/components/sections/contact";
 import Footer from "@/components/sections/footer";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { db } from "@/lib/db";
 import { blogPosts } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
@@ -90,8 +90,19 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
-      <Header />
-      <main className="pt-20">
+      <main className="pt-0">
+        {/* Back to Home Button - At the very top */}
+        <div className="bg-[#18181b] px-6 md:px-12 lg:px-24 pt-8 pb-2">
+          <div className="max-w-5xl mx-auto">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 text-sm text-white/60 hover:text-white/80 transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to home
+            </Link>
+          </div>
+        </div>
         <BlogSignalSection showButton={false} />
         <div className="bg-[#18181b] pb-24 px-6 md:px-12 lg:px-24 -mt-8 md:-mt-12">
           <div className="max-w-5xl mx-auto">
