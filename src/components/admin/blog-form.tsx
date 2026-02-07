@@ -54,9 +54,17 @@ export function BlogForm({ initialData, existingTags }: { initialData?: BlogPost
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [availableTags, setAvailableTags] = useState<BlogTag[]>(existingTags || []);
-  const [selectedTagIds, setSelectedTagIds] = useState<string[]>(
-    initialData?.tags ? JSON.parse(initialData.tags) : []
-  );
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>(() => {
+    if (initialData?.tags) {
+      try {
+        const parsed = JSON.parse(initialData.tags);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
   const [newTagName, setNewTagName] = useState("");
 
   const [formData, setFormData] = useState({
