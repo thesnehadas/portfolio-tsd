@@ -1,4 +1,7 @@
+"use client";
+
 import React from 'react';
+import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 
 interface ServiceItem {
@@ -10,22 +13,17 @@ interface ServiceItem {
 const services: ServiceItem[] = [
   {
     title: "AI Agent Development",
-    description: "Production-grade AI agents that handle campaigns, reporting, outreach, and internal operations. Built end-to-end and deployed into your workflow.",
+    description: "Production-grade AI systems for pipeline generation, sales acceleration, and operational workflows. Built end-to-end and deployed into your infrastructure.",
     href: "/services/ai-agents"
   },
   {
     title: "Hands-on Consulting",
-    description: "Engineering support to design, build, and ship the AI systems your team doesn't have time or expertise to tackle.",
+    description: "Technical implementation support to architect, build, and deploy AI infrastructure when your team lacks bandwidth or specialized expertise.",
     href: "/services/consulting"
   },
   {
-    title: "Workshops and Training",
-    description: "Working sessions and practical training on AI strategy, LLM workflows, and marketing measurement—for teams that want clarity and skills, not slides.",
-    href: "/services/workshops"
-  },
-  {
     title: "Mentorships",
-    description: "1-on-1 guidance for anyone who needs help leveling up in AI, causality or data science for marketing.",
+    description: "1-on-1 technical guidance for professionals building expertise in AI systems, automation architecture, or data-driven decision-making.",
     href: "/services/mentorship"
   }
 ];
@@ -42,7 +40,7 @@ const WhatIDo: React.FC = () => {
 
       <div className="flex flex-col">
         {services.map((service, index) => (
-          <a
+          <Link
             key={index}
             href={service.href}
             className="group block w-full text-left border-t border-border py-5 transition-colors hover:bg-accent/30 -mx-4 px-4"
@@ -62,7 +60,7 @@ const WhatIDo: React.FC = () => {
                 </p>
               </div>
             </div>
-          </a>
+          </Link>
         ))}
         {/* Bottom border to close the list if needed, though the original uses border-t only */}
         <div className="border-t border-border w-full"></div>

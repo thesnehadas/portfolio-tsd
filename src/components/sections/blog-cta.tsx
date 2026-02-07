@@ -4,14 +4,12 @@ import { ArrowUpRight } from 'lucide-react';
 /**
  * BlogCTA Component
  * 
- * Clones the dark themed "the signal" blog section with specific background color, 
+ * Clones the dark themed "mind models" blog section with specific background color, 
  * inverted signal logo, and high-contrast button.
  * 
  * Theme: light (container is light, but the section itself is high-contrast dark)
  */
 export default function BlogCTA() {
-  const signalLogoUrl = "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/008c3d0b-88f7-4259-83d6-596df0a76090-arthurmello-ai/assets/icons/signal-logo-CvcImUgW-1.png";
-
   return (
     <section className="py-24 md:py-32 px-6 md:px-12 lg:px-24 bg-[#1F1B19] text-[#FBF9F6]">
       <div className="max-w-5xl mx-auto">
@@ -26,10 +24,9 @@ export default function BlogCTA() {
           {/* Logo and Label */}
           <div className="flex items-center gap-3 mb-6">
             <img 
-              src={signalLogoUrl} 
-              alt="The Signal logo" 
-              className="h-6 w-auto invert brightness-0" 
-              style={{ filter: 'invert(100%)' }}
+              src="/mind-models-logo-png.png" 
+              alt="Mind Models logo" 
+              className="h-8 md:h-10 w-auto"
             />
             <p className="text-sm uppercase tracking-[0.2em] text-[#FBF9F6]/60 font-sans font-medium">
               Blog
@@ -38,12 +35,13 @@ export default function BlogCTA() {
 
           {/* Headline */}
           <h2 className="text-3xl md:text-4xl mb-6 text-[#FBF9F6] font-display">
-            the signal
+            mind models
           </h2>
 
           {/* Description */}
           <p className="text-lg text-[#FBF9F6]/70 font-sans font-light leading-relaxed mb-8">
-            A blog about building real AI systems for marketing: agents, models, experiments, and the engineering behind them.
+            Reflections on AI engineering, lessons from building<br />
+            and living, and figuring things along the way.
           </p>
 
           {/* CTA Button */}

@@ -4,7 +4,7 @@ import { ArrowUpRight } from 'lucide-react';
 /**
  * BlogSignalSection Component
  * 
- * A high-contrast dark section for "the signal" blog.
+ * A high-contrast dark section for "mind models" blog.
  * Incorporates retro window controls, the signal logo icon, serif typography,
  * and an outlined "Read the blog" button.
  */
@@ -26,10 +26,9 @@ const BlogSignalSection = () => {
           {/* Label and Logo */}
           <div className="flex items-center gap-3 mb-6">
             <img 
-              src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/008c3d0b-88f7-4259-83d6-596df0a76090-arthurmello-ai/assets/icons/signal-logo-CvcImUgW-1.png" 
-              alt="The Signal logo" 
-              className="h-6 w-auto invert brightness-0 transition-all"
-              style={{ filter: 'invert(1)' }}
+              src="/mind-models-logo-png.png" 
+              alt="Mind Models logo" 
+              className="h-8 md:h-10 w-auto"
             />
             <p className="text-sm uppercase tracking-[0.2em] text-white/60 font-sans font-medium">
               Blog
@@ -47,12 +46,13 @@ const BlogSignalSection = () => {
               lineHeight: '1.2'
             }}
           >
-            the signal
+            mind models
           </h2>
 
           {/* Description */}
           <p className="text-lg text-white/70 font-light leading-relaxed mb-10 max-w-xl">
-            A blog about building real AI systems for marketing: agents, models, experiments, and the engineering behind them.
+            Reflections on AI engineering, lessons from building<br />
+            and living, and figuring things along the way.
           </p>
 
           {/* Outlined Button CTA */}

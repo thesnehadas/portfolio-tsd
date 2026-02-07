@@ -9,6 +9,7 @@ import AboutSection from "@/components/sections/about";
 import BlogSignalSection from "@/components/sections/blog-signal";
 import ContactSection from "@/components/sections/contact";
 import Footer from "@/components/sections/footer";
+import FloatingChat from "@/components/floating-chat";
 
 export default function Home() {
   return (
@@ -26,6 +27,7 @@ export default function Home() {
         <ContactSection />
       </main>
       <Footer />
+      <FloatingChat />
     </div>
   );
 }

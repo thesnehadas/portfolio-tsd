@@ -4,15 +4,15 @@ const WhoIHelp = () => {
   const personas = [
     {
       title: "Founders & entrepreneurs",
-      quote: '"Can we automate our marketing so I’m not the bottleneck anymore?"',
+      quote: '"Can we automate our outbound so we can focus on closing deals?"',
     },
     {
       title: "Marketing & growth teams",
-      quote: '"Which channels are actually working?"',
+      quote: '"How do we scale content and SEO without hiring more writers?"',
     },
     {
-      title: "Data people & AI engineers",
-      quote: '"How do I turn my notebooks into actual apps?"',
+      title: "Sales & ops teams",
+      quote: '"Can we qualify leads and handle support without manual work?"',
     },
   ];
 

@@ -6,13 +6,14 @@ const AboutSection: React.FC = () => {
   return (
     <section 
       id="about" 
-      className="py-10 md:py-12 px-6 md:px-12 lg:px-24 max-w-5xl mx-auto border-t border-[#e4e4e7]"
+      className="py-10 md:py-12 px-6 md:px-12 lg:px-24 max-w-5xl mx-auto border-t border-[#e4e4e7] relative"
       style={{
         backgroundColor: 'transparent',
       }}
     >
+
       <h2 
-        className="font-display text-2xl md:text-3xl mb-8 text-center"
+        className="font-display text-2xl md:text-3xl mb-12 text-center"
         style={{
           color: 'rgb(34, 31, 28)',
           lineHeight: '1.2',
@@ -21,63 +22,64 @@ const AboutSection: React.FC = () => {
         About me
       </h2>
       
-      <div className="max-w-2xl mx-auto space-y-6 text-[#71717a] font-light leading-relaxed">
-        <p className="text-base">
-          I&apos;m a full-stack data scientist / AI engineer who works at the intersection of AI, marketing measurement and automation.
-        </p>
+      <div className="max-w-2xl mx-auto">
+        <div className="space-y-6 text-[#71717a] font-light leading-relaxed">
+          <p className="text-base">
+            I&apos;m an AI engineer at Jupiter (YC S19) from IIT Roorkee, building autonomous AI agents for marketing, outbound, and operations. I&apos;ve helped several brands including YC-backed startups and Shark Tank brands to automate and scale.
+          </p>
+      
+          <p className="text-base">
+            I got into data during IIT JEE prep, analyzing thousands of questions to crack the exam in 4 months. When I discovered LangGraph and n8n, I could finally build systems that acted autonomously.
+          </p>
+        </div>
         
-        <p className="text-base">
-          I specialize in helping teams ship fast: designing AI agents that deliver real value, building models that measure causality, and teaching data people how to build things.
-        </p>
-        
-        <p className="text-base">
-          Some of the things I&apos;ve done:
-        </p>
-        
-        <ul className="space-y-3 py-4">
-          <li className="flex items-center gap-4 text-[#71717a] font-light text-base">
-            <span 
-              className="w-1.5 h-1.5 rounded-full bg-[#09090b]/30 flex-shrink-0" 
-              aria-hidden="true"
-            />
-            AI agents in production
-          </li>
-          <li className="flex items-center gap-4 text-[#71717a] font-light text-base">
-            <span 
-              className="w-1.5 h-1.5 rounded-full bg-[#09090b]/30 flex-shrink-0" 
-              aria-hidden="true"
-            />
-            Media mix modeling for retail &amp; e-commerce
-          </li>
-          <li className="flex items-center gap-4 text-[#71717a] font-light text-base">
-            <span 
-              className="w-1.5 h-1.5 rounded-full bg-[#09090b]/30 flex-shrink-0" 
-              aria-hidden="true"
-            />
-            RAG systems for enterprise knowledge bases
-          </li>
-          <li className="flex items-center gap-4 text-[#71717a] font-light text-base">
-            <span 
-              className="w-1.5 h-1.5 rounded-full bg-[#09090b]/30 flex-shrink-0" 
-              aria-hidden="true"
-            />
-            Price elasticity estimation
-          </li>
-        </ul>
-        
-        <p className="text-base">
-          Some of the tech I work with: Python, SQL and GCP.
-        </p>
-        
-        <p className="text-base">
-          When I&apos;m not building AI systems, you&apos;ll find me on the BJJ mats, lost in a good book, or{' '}
-          <button 
-            type="button"
-            className="text-[#221f1c]/80 underline decoration-dashed underline-offset-4 hover:text-[#221f1c] transition-colors cursor-pointer bg-transparent border-none p-0 font-light"
-          >
-            playing games
-          </button>.
-        </p>
+        <div className="space-y-6 text-[#71717a] font-light leading-relaxed mt-8">
+          <p className="text-base">
+            Some things I&apos;ve built:
+          </p>
+          
+          <ul className="space-y-3 pt-3">
+            <li className="flex items-center gap-4 text-[#71717a] font-light text-base">
+              <span 
+                className="w-1.5 h-1.5 rounded-full bg-[#09090b]/30 flex-shrink-0" 
+                aria-hidden="true"
+              />
+              Multi-channel outbound automation agents for personalized prospecting
+            </li>
+            <li className="flex items-center gap-4 text-[#71717a] font-light text-base">
+              <span 
+                className="w-1.5 h-1.5 rounded-full bg-[#09090b]/30 flex-shrink-0" 
+                aria-hidden="true"
+              />
+              SEO strategy agents for keyword analysis and ranking
+            </li>
+            <li className="flex items-center gap-4 text-[#71717a] font-light text-base">
+              <span 
+                className="w-1.5 h-1.5 rounded-full bg-[#09090b]/30 flex-shrink-0" 
+                aria-hidden="true"
+              />
+              Lead quality analysis agents with signal identification
+            </li>
+            <li className="flex items-center gap-4 text-[#71717a] font-light text-base">
+              <span 
+                className="w-1.5 h-1.5 rounded-full bg-[#09090b]/30 flex-shrink-0" 
+                aria-hidden="true"
+              />
+              Multi-agent customer support chatbots for WhatsApp and Web
+            </li>
+            <li className="flex items-center gap-4 text-[#71717a] font-light text-base">
+              <span 
+                className="w-1.5 h-1.5 rounded-full bg-[#09090b]/30 flex-shrink-0" 
+                aria-hidden="true"
+              />
+              AI agents for competitor analysis and SEO content generation
+            </li>
+          </ul>
+          
+          <p className="text-base">
+            When I&apos;m not building systems, I&apos;m watching podcasts on psychology or mythology, reading fiction and leadership books, writing shayaris, singing, or caring for my pets.
+          </p>
+        </div>
       </div>
     </section>
   );
