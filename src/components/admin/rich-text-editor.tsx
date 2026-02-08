@@ -5,8 +5,6 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
-import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
-import { lowlight } from "lowlight";
 import { Button } from "@/components/ui/button";
 import { 
   Bold, 
@@ -32,7 +30,15 @@ interface RichTextEditorProps {
 export function RichTextEditor({ content, onChange, placeholder }: RichTextEditorProps) {
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        // Exclude Link and CodeBlock from StarterKit to configure them separately
+        link: false,
+        codeBlock: {
+          HTMLAttributes: {
+            class: "bg-gray-100 p-4 rounded",
+          },
+        },
+      }),
       Image.configure({
         inline: true,
         allowBase64: true,
@@ -42,9 +48,6 @@ export function RichTextEditor({ content, onChange, placeholder }: RichTextEdito
         HTMLAttributes: {
           class: "text-blue-600 underline",
         },
-      }),
-      CodeBlockLowlight.configure({
-        lowlight,
       }),
     ],
     content: content || "",
