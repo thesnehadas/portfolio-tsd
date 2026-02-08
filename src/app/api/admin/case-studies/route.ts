@@ -138,14 +138,15 @@ export async function POST(request: NextRequest) {
       status: status,
       isFeatured: isFeatured,
       // Legacy fields for backward compatibility
-      title: body.clientName.trim() || nullIfEmpty(body.title),
-      // Ensure description is always set (even if empty) to avoid NOT NULL constraint issues
-      description: nullIfEmpty(body.description) || nullIfEmpty(body.metaDescription) || null,
+      // Title has NOT NULL constraint, ensure it's never null
+      title: body.clientName.trim() || body.title?.trim() || "",
+      // Description has NOT NULL constraint, ensure it's never null
+      description: body.description?.trim() || body.metaDescription?.trim() || "",
       fullDescription: nullIfEmpty(body.fullDescription),
       // Metrics has NOT NULL constraint, so ensure it's never null
-      metrics: body.metrics && body.metrics.trim() ? body.metrics.trim() : "",
-      // Details also might have NOT NULL constraint
-      details: body.details && body.details.trim() ? body.details.trim() : "",
+      metrics: body.metrics?.trim() || "",
+      // Details is nullable in schema but ensure it's a string
+      details: body.details?.trim() || "",
     };
 
     // Log the values being inserted (for debugging - remove sensitive data in production)
