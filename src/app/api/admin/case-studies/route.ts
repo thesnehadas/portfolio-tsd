@@ -17,6 +17,45 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// Helper function to retry database operations on connection pool errors
+async function retryDbOperation<T>(
+  operation: () => Promise<T>,
+  maxRetries = 2,
+  delayMs = 1000
+): Promise<T> {
+  let lastError: any;
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error: any) {
+      lastError = error;
+      
+      // Check if it's a connection pool error
+      const isPoolError = 
+        error.message?.includes('MaxClientsInSessionMode') ||
+        error.message?.includes('max clients reached') ||
+        error.message?.includes('connection') ||
+        error.code === '57P01' || // Admin shutdown
+        error.code === '57P02' || // Crash shutdown
+        error.code === '57P03';    // Cannot connect now
+      
+      if (isPoolError && attempt < maxRetries) {
+        // Wait before retrying (exponential backoff)
+        const waitTime = delayMs * Math.pow(2, attempt);
+        console.log(`Connection pool error, retrying in ${waitTime}ms (attempt ${attempt + 1}/${maxRetries + 1})...`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        continue;
+      }
+      
+      // Not a retryable error or max retries reached
+      throw error;
+    }
+  }
+  
+  throw lastError;
+}
+
 export async function POST(request: NextRequest) {
   try {
     await requireAuthAPI(request);
@@ -39,12 +78,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if slug already exists
-    const existing = await db
-      .select()
-      .from(caseStudies)
-      .where(eq(caseStudies.slug, slug))
-      .limit(1);
+    // Check if slug already exists (with retry)
+    const existing = await retryDbOperation(async () => {
+      return await db
+        .select()
+        .from(caseStudies)
+        .where(eq(caseStudies.slug, slug))
+        .limit(1);
+    });
 
     if (existing.length > 0) {
       return NextResponse.json(
@@ -110,10 +151,13 @@ export async function POST(request: NextRequest) {
       hasSolutionOverview: !!values.solutionOverview,
     });
 
-    const newStudy = await db
-      .insert(caseStudies)
-      .values(values)
-      .returning();
+    // Insert with retry logic for connection pool errors
+    const newStudy = await retryDbOperation(async () => {
+      return await db
+        .insert(caseStudies)
+        .values(values)
+        .returning();
+    });
 
     return NextResponse.json(newStudy[0]);
   } catch (error: any) {
@@ -175,6 +219,15 @@ export async function POST(request: NextRequest) {
     
     // Provide more helpful error messages
     let errorMessage = dbError.message || error.message || "Failed to create case study";
+    
+    // Handle connection pool errors specifically
+    if (
+      errorMessage.includes('MaxClientsInSessionMode') ||
+      errorMessage.includes('max clients reached') ||
+      errorCode === '57P01' || errorCode === '57P02' || errorCode === '57P03'
+    ) {
+      errorMessage = "Database connection limit reached. Please try again in a moment. If this persists, the connection pool may need adjustment.";
+    }
     
     // Handle specific database errors
     if (errorCode === '23505') { // Unique violation
