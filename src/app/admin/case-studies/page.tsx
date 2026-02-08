@@ -74,7 +74,9 @@ ADD COLUMN IF NOT EXISTS is_featured INTEGER NOT NULL DEFAULT 0;
 DO $$ 
 BEGIN
   IF NOT EXISTS (
-    SELECT 1 FROM pg_constraint WHERE conname = 'case_studies_slug_unique'
+    SELECT 1 FROM pg_constraint 
+    WHERE conname = 'case_studies_slug_unique' 
+    AND conrelid = 'case_studies'::regclass
   ) THEN
     ALTER TABLE case_studies ADD CONSTRAINT case_studies_slug_unique UNIQUE (slug);
   END IF;
@@ -87,12 +89,12 @@ CREATE INDEX IF NOT EXISTS idx_case_studies_is_featured ON case_studies(is_featu
 
 -- Migrate existing data
 UPDATE case_studies 
-SET client_name = title 
-WHERE client_name IS NULL AND title IS NOT NULL;
+SET client_name = COALESCE(title, 'Untitled Case Study')
+WHERE client_name IS NULL;
 
 UPDATE case_studies 
-SET slug = LOWER(REPLACE(REPLACE(REPLACE(REPLACE(COALESCE(title, 'untitled'), ' ', '-'), '_', '-'), '--', '-'), '---', '-'))
-WHERE slug IS NULL AND title IS NOT NULL;
+SET slug = LOWER(REPLACE(REPLACE(REPLACE(REPLACE(COALESCE(client_name, title, 'untitled'), ' ', '-'), '_', '-'), '--', '-'), '---', '-')) || '-' || SUBSTRING(id, 1, 8)
+WHERE slug IS NULL;
 
 UPDATE case_studies 
 SET status = 'published' 

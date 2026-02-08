@@ -13,9 +13,9 @@ export const users = pgTable("users", {
 export const caseStudies = pgTable("case_studies", {
   id: text("id").primaryKey().default(sql`gen_random_uuid()::text`),
   // Basic Info
-  clientName: text("client_name").notNull(),
+  clientName: text("client_name"), // Made optional to handle migration
   industry: text("industry"),
-  slug: text("slug").notNull().unique(),
+  slug: text("slug"), // Made optional to handle migration, unique constraint in DB
   featuredImage: text("featured_image"), // URL or path
   // Content (Rich Text - HTML)
   problemChallenge: text("problem_challenge"), // Rich text HTML

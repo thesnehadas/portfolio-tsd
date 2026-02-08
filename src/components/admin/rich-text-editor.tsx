@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
@@ -46,19 +47,27 @@ export function RichTextEditor({ content, onChange, placeholder }: RichTextEdito
         lowlight,
       }),
     ],
-    content,
+    content: content || "",
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
     editorProps: {
       attributes: {
         class: "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[200px] p-4",
+        placeholder: placeholder || "Start typing...",
       },
     },
   });
 
+  // Update editor content when prop changes
+  useEffect(() => {
+    if (editor && content !== undefined && editor.getHTML() !== content) {
+      editor.commands.setContent(content || "");
+    }
+  }, [content, editor]);
+
   if (!editor) {
-    return null;
+    return <div className="border border-gray-300 rounded-lg min-h-[200px] p-4 bg-white">Loading editor...</div>;
   }
 
   const addImage = async () => {
