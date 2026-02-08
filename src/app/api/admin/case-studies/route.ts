@@ -142,8 +142,10 @@ export async function POST(request: NextRequest) {
       // Ensure description is always set (even if empty) to avoid NOT NULL constraint issues
       description: nullIfEmpty(body.description) || nullIfEmpty(body.metaDescription) || null,
       fullDescription: nullIfEmpty(body.fullDescription),
-      metrics: nullIfEmpty(body.metrics),
-      details: nullIfEmpty(body.details),
+      // Metrics has NOT NULL constraint, so ensure it's never null
+      metrics: body.metrics && body.metrics.trim() ? body.metrics.trim() : "",
+      // Details also might have NOT NULL constraint
+      details: body.details && body.details.trim() ? body.details.trim() : "",
     };
 
     // Log the values being inserted (for debugging - remove sensitive data in production)

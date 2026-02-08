@@ -107,10 +107,12 @@ export async function PUT(
         isFeatured: isFeatured,
         // Legacy fields for backward compatibility
         title: body.clientName.trim() || nullIfEmpty(body.title),
-        description: nullIfEmpty(body.description),
+        description: nullIfEmpty(body.description) || nullIfEmpty(body.metaDescription) || null,
         fullDescription: nullIfEmpty(body.fullDescription),
-        metrics: nullIfEmpty(body.metrics),
-        details: nullIfEmpty(body.details),
+        // Metrics has NOT NULL constraint, so ensure it's never null
+        metrics: body.metrics && body.metrics.trim() ? body.metrics.trim() : "",
+        // Details also might have NOT NULL constraint
+        details: body.details && body.details.trim() ? body.details.trim() : "",
         updatedAt: new Date(),
       })
       .where(eq(caseStudies.id, id))
