@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Autoplay from "embla-carousel-autoplay";
+import Link from "next/link";
 import {
   Carousel,
   CarouselContent,
@@ -20,22 +21,30 @@ import {
 /**
  * CaseStudiesSection Component
  * 
- * Displays case studies with metrics showcasing results in a carousel.
- * Features retro-inspired design with window controls and metrics cards.
- * Shows one case study at a time with auto-looping.
+ * Displays featured case studies in a carousel.
+ * Fetches from database and shows only featured, published case studies.
  */
 interface CaseStudyProps {
-  title: string;
-  description: string;
-  fullDescription?: string;
-  metrics: Array<{
-    label: string;
-    value: string;
-  }>;
-  details?: string[];
+  id: string;
+  clientName?: string;
+  title?: string;
+  description?: string;
+  solutionOverview?: string;
+  results?: string;
+  keyFeatures?: string;
+  featuredImage?: string;
+  slug?: string;
 }
 
-const CaseStudyCard: React.FC<CaseStudyProps & { onOpen: () => void }> = ({ title, description, metrics, onOpen }) => {
+const CaseStudyCard: React.FC<CaseStudyProps & { onOpen: () => void }> = ({ 
+  clientName, 
+  title, 
+  description, 
+  featuredImage,
+  onOpen 
+}) => {
+  const displayName = clientName || title || "Untitled";
+  
   return (
     <button
       onClick={onOpen}
@@ -48,87 +57,55 @@ const CaseStudyCard: React.FC<CaseStudyProps & { onOpen: () => void }> = ({ titl
         <div className="w-2.5 h-2.5 rounded-full bg-[#2ecc71]"></div>
       </div>
       
+      {/* Featured Image */}
+      {featuredImage && (
+        <div className="mb-6 -mx-8 md:-mx-10 lg:-mx-12 -mt-8 md:-mt-10 lg:-mt-12">
+          <img
+            src={featuredImage}
+            alt={displayName}
+            className="w-full h-48 object-cover"
+          />
+        </div>
+      )}
+      
       {/* Title */}
       <h3 className="text-2xl md:text-3xl font-serif font-semibold text-[#09090b] mb-4">
-        {title}
+        {displayName}
       </h3>
       
       {/* Description */}
-      <p className="text-lg md:text-xl text-[#71717a] font-light leading-relaxed mb-8">
-        {description}
-      </p>
-      
-      {/* Metrics */}
-      <div className="grid grid-cols-2 gap-6 pt-6 border-t border-[#4a3728]/20">
-        {metrics.map((metric, index) => (
-          <div key={index}>
-            <div className="text-3xl md:text-4xl font-serif font-semibold text-[#09090b] mb-2">
-              {metric.value}
-            </div>
-            <div className="text-sm text-[#71717a] font-sans uppercase tracking-wider">
-              {metric.label}
-            </div>
-          </div>
-        ))}
-      </div>
+      {description && (
+        <p className="text-lg md:text-xl text-[#71717a] font-light leading-relaxed">
+          {description}
+        </p>
+      )}
     </button>
   );
 };
 
 const CaseStudiesSection: React.FC = () => {
+  const [caseStudies, setCaseStudies] = useState<CaseStudyProps[]>([]);
   const [selectedStudy, setSelectedStudy] = useState<CaseStudyProps | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const caseStudies: CaseStudyProps[] = [
-    {
-      title: "AI-Powered Marketing Automation",
-      description: "Built an AI agent system that automated content creation and campaign optimization, reducing manual work by 80%.",
-      fullDescription: "This comprehensive AI agent system revolutionized how the marketing team operates. By leveraging advanced language models and automation workflows, we created a system that handles content ideation, creation, optimization, and distribution across multiple channels. The system integrates seamlessly with existing marketing tools and provides real-time insights and recommendations.",
-      metrics: [
-        { label: "Time Saved", value: "80%" },
-        { label: "ROI Increase", value: "3.5x" },
-      ],
-      details: [
-        "Automated content generation for social media, email campaigns, and blog posts",
-        "Real-time campaign optimization based on performance data",
-        "Integration with major marketing platforms (HubSpot, Mailchimp, Google Ads)",
-        "Reduced content creation time from 4 hours to 30 minutes per piece",
-        "Improved campaign performance through data-driven optimization"
-      ],
-    },
-    {
-      title: "Causal Inference Platform",
-      description: "Developed a marketing mix model that accurately measured incremental impact across all channels.",
-      fullDescription: "A sophisticated causal inference platform that goes beyond traditional attribution models. Using advanced statistical methods and machine learning, this platform accurately measures the true incremental impact of each marketing channel, accounting for external factors, seasonality, and cross-channel interactions. The platform provides actionable insights that help optimize marketing spend and improve overall ROI.",
-      metrics: [
-        { label: "Accuracy", value: "94%" },
-        { label: "Cost Reduction", value: "40%" },
-      ],
-      details: [
-        "Multi-touch attribution with causal inference methods",
-        "Real-time impact measurement across all marketing channels",
-        "Budget optimization recommendations based on incremental impact",
-        "Integration with existing analytics and marketing platforms",
-        "Reduced wasted ad spend by identifying non-incremental channels"
-      ],
-    },
-    {
-      title: "MMM Implementation",
-      description: "Implemented a full MMM solution that replaced outdated attribution models and provided actionable insights.",
-      fullDescription: "A complete Media Mix Modeling (MMM) solution that provides a holistic view of marketing effectiveness. This implementation uses Bayesian methods to model the relationship between marketing spend and business outcomes, accounting for lag effects, saturation, and interactions between channels. The solution replaced legacy attribution models and provided the marketing team with reliable, actionable insights for budget allocation and strategy.",
-      metrics: [
-        { label: "Insight Speed", value: "10x" },
-        { label: "Budget Efficiency", value: "25%" },
-      ],
-      details: [
-        "Bayesian MMM model with weekly and monthly granularity",
-        "Automated reporting and insight generation",
-        "Budget allocation recommendations based on model predictions",
-        "Scenario planning and what-if analysis capabilities",
-        "Integration with finance and marketing planning tools"
-      ],
-    },
-  ];
+  useEffect(() => {
+    const fetchCaseStudies = async () => {
+      try {
+        const response = await fetch('/api/case-studies?featured=true&status=published');
+        if (response.ok) {
+          const data = await response.json();
+          setCaseStudies(data);
+        }
+      } catch (error) {
+        console.error('Error fetching case studies:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCaseStudies();
+  }, []);
 
   const plugin = React.useRef(
     Autoplay({ delay: 5000, stopOnInteraction: false, stopOnMouseEnter: true })
@@ -139,13 +116,26 @@ const CaseStudiesSection: React.FC = () => {
     setIsDialogOpen(true);
   };
 
+  // Don't render if no case studies
+  if (loading || caseStudies.length === 0) {
+    return null;
+  }
+
   return (
     <section id="case-studies" className="py-10 md:py-12 px-6 md:px-12 lg:px-24 max-w-5xl mx-auto scroll-mt-20">
       {/* Section Header */}
       <div className="mb-16">
-        <h2 className="text-3xl md:text-4xl font-serif text-[#09090b] mb-4">
-          Case Studies
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-3xl md:text-4xl font-serif text-[#09090b]">
+            Case Studies
+          </h2>
+          <Link
+            href="/casestudies"
+            className="text-[#71717a] hover:text-[#09090b] transition-colors text-sm md:text-base"
+          >
+            View all →
+          </Link>
+        </div>
         <p className="text-lg text-[#71717a] font-light max-w-2xl">
           Real results from AI systems built for marketing teams.
         </p>
@@ -156,14 +146,14 @@ const CaseStudiesSection: React.FC = () => {
         <Carousel
           opts={{
             align: "center",
-            loop: true,
+            loop: caseStudies.length > 1,
           }}
           plugins={[plugin.current]}
           className="w-full"
         >
           <CarouselContent className="-ml-2 md:-ml-4">
-            {caseStudies.map((study, index) => (
-              <CarouselItem key={index} className="pl-2 md:pl-4">
+            {caseStudies.map((study) => (
+              <CarouselItem key={study.id} className="pl-2 md:pl-4">
                 <CaseStudyCard {...study} onOpen={() => handleOpenStudy(study)} />
               </CarouselItem>
             ))}
@@ -175,7 +165,7 @@ const CaseStudiesSection: React.FC = () => {
 
       {/* Case Study Detail Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-3xl bg-[#fdfaf3] border-2 border-[#4a3728]">
+        <DialogContent className="max-w-3xl bg-[#fdfaf3] border-2 border-[#4a3728] max-h-[90vh] overflow-y-auto">
           {selectedStudy && (
             <>
               <DialogHeader>
@@ -185,40 +175,55 @@ const CaseStudiesSection: React.FC = () => {
                   <div className="w-2.5 h-2.5 rounded-full bg-[#2ecc71]"></div>
                 </div>
                 <DialogTitle className="text-2xl md:text-3xl font-serif font-semibold text-[#09090b]">
-                  {selectedStudy.title}
+                  {selectedStudy.clientName || selectedStudy.title || "Untitled"}
                 </DialogTitle>
-                <DialogDescription className="text-base text-[#71717a] font-light leading-relaxed mt-4">
-                  {selectedStudy.fullDescription || selectedStudy.description}
-                </DialogDescription>
+                {selectedStudy.description && (
+                  <DialogDescription className="text-base text-[#71717a] font-light leading-relaxed mt-4">
+                    {selectedStudy.description}
+                  </DialogDescription>
+                )}
               </DialogHeader>
               
-              <div className="mt-6">
-                <h4 className="text-lg font-serif font-semibold text-[#09090b] mb-4">Key Results</h4>
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                  {selectedStudy.metrics.map((metric, index) => (
-                    <div key={index} className="bg-white/50 rounded-lg p-4 border border-[#4a3728]/20">
-                      <div className="text-2xl md:text-3xl font-serif font-semibold text-[#09090b] mb-1">
-                        {metric.value}
-                      </div>
-                      <div className="text-sm text-[#71717a] font-sans uppercase tracking-wider">
-                        {metric.label}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              <div className="mt-6 space-y-6">
+                {selectedStudy.solutionOverview && (
+                  <div>
+                    <h4 className="text-lg font-serif font-semibold text-[#09090b] mb-3">Solution Overview</h4>
+                    <div 
+                      className="prose prose-sm max-w-none text-[#71717a]"
+                      dangerouslySetInnerHTML={{ __html: selectedStudy.solutionOverview }}
+                    />
+                  </div>
+                )}
 
-                {selectedStudy.details && selectedStudy.details.length > 0 && (
-                  <>
-                    <h4 className="text-lg font-serif font-semibold text-[#09090b] mb-4">Key Features</h4>
-                    <ul className="space-y-2">
-                      {selectedStudy.details.map((detail, index) => (
-                        <li key={index} className="flex items-start gap-3 text-[#71717a] font-light">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#4a3728] mt-2 flex-shrink-0"></span>
-                          <span>{detail}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </>
+                {selectedStudy.results && (
+                  <div>
+                    <h4 className="text-lg font-serif font-semibold text-[#09090b] mb-3">Results</h4>
+                    <div 
+                      className="prose prose-sm max-w-none text-[#71717a]"
+                      dangerouslySetInnerHTML={{ __html: selectedStudy.results }}
+                    />
+                  </div>
+                )}
+
+                {selectedStudy.keyFeatures && (
+                  <div>
+                    <h4 className="text-lg font-serif font-semibold text-[#09090b] mb-3">Key Features</h4>
+                    <div 
+                      className="prose prose-sm max-w-none text-[#71717a]"
+                      dangerouslySetInnerHTML={{ __html: selectedStudy.keyFeatures }}
+                    />
+                  </div>
+                )}
+
+                {selectedStudy.slug && (
+                  <div className="pt-4 border-t border-[#4a3728]/20">
+                    <Link
+                      href={`/casestudies/${selectedStudy.slug}`}
+                      className="text-[#09090b] hover:underline font-semibold"
+                    >
+                      Read full case study →
+                    </Link>
+                  </div>
                 )}
               </div>
             </>

@@ -82,9 +82,6 @@ const TestimonialSection: React.FC = () => {
         <h2 className="text-3xl md:text-4xl font-serif text-[#09090b] mb-4">
           In their words
         </h2>
-        <p className="text-lg text-[#71717a] font-light max-w-2xl">
-          Real feedback from teams I've worked with.
-        </p>
       </div>
 
       {/* Testimonials Carousel */}
