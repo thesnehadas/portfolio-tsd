@@ -195,9 +195,17 @@
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  h1, h2, h3, h4, .font-serif {
+  h1, h2, h3, h4 {
     font-family: var(--font-display);
     font-weight: 400;
+  }
+  
+  .font-serif,
+  h1.font-serif,
+  h2.font-serif,
+  h3.font-serif,
+  h4.font-serif {
+    font-family: var(--font-display) !important;
   }
 
   h1 {
