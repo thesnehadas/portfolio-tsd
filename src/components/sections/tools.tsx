@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import {
   Dialog,
@@ -63,9 +63,10 @@ const ToolCard: React.FC<ToolCardProps> = ({ title, shortDescription, onOpen }) 
 };
 
 interface Tool {
+  id: string;
   title: string;
-  shortDescription: string; // For the card
-  fullDescription: string; // For the dialog
+  summary: string; // For the card
+  description: string; // For the dialog
 }
 
 const ToolsSection: React.FC = () => {
@@ -76,44 +77,44 @@ const ToolsSection: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [allTools, setAllTools] = useState<Tool[]>([]);
+  const [toolsLoading, setToolsLoading] = useState(true);
 
-  const allTools: Tool[] = [
-    {
-      title: "AI Marketing Workflow Toolkit",
-      shortDescription: "How to use ChatGPT to speed up your marketing processes.",
-      fullDescription: "A comprehensive toolkit that teaches you how to leverage ChatGPT and AI tools to automate and accelerate your marketing workflows. Learn practical prompts, workflow templates, and strategies to reduce manual work and increase productivity in content creation, campaign planning, and marketing operations."
-    },
-    {
-      title: "BS-Proof Attribution Checklist",
-      shortDescription: "A tool to help you challenge your current attribution measurements.",
-      fullDescription: "A systematic checklist designed to help you identify and challenge flawed attribution models. This toolkit provides frameworks to evaluate attribution accuracy, spot common measurement errors, and build more reliable attribution systems that actually reflect marketing impact."
-    },
-    {
-      title: "Marketing Feature Engineering Handbook",
-      shortDescription: "A compact, high-utility reference guide for data people working on marketing problems.",
-      fullDescription: "A practical handbook for data scientists and analysts working on marketing problems. Covers essential feature engineering techniques, common marketing data transformations, and best practices for building robust marketing models. Includes code examples and real-world case studies."
-    },
-    {
-      title: '"Marketing Experiment Lab" Toolkit',
-      shortDescription: "Run proper experiments and measure true incremental impact.",
-      fullDescription: "A complete toolkit for designing, running, and analyzing marketing experiments. Learn how to set up proper A/B tests, control for external factors, calculate statistical significance, and measure true incremental impact of your marketing initiatives."
-    },
-    {
-      title: "Retail Demand & Promo Simulator – Lite",
-      shortDescription: "Simulate demand scenarios and optimize your promo calendar.",
-      fullDescription: "A simulation tool that helps you model demand scenarios and optimize your promotional calendar. Understand how different promotions affect demand, plan inventory, and maximize ROI from your promotional activities."
-    },
-    {
-      title: "Startup Pitch Generator",
-      shortDescription: "AI-powered tool to generate and refine investor-ready pitches.",
-      fullDescription: "An AI-powered tool that helps you generate, refine, and perfect your investor pitch deck. Get structured templates, AI-generated content suggestions, and feedback to create compelling pitches that resonate with investors."
-    },
-    {
-      title: "MMM for Humans",
-      shortDescription: "Understand your marketing mix without a PhD in statistics.",
-      fullDescription: "A simplified guide to Marketing Mix Modeling (MMM) that makes complex statistical concepts accessible. Learn how to build and interpret MMM models, understand marketing effectiveness, and make data-driven budget allocation decisions—all explained in plain language."
-    }
-  ];
+  // Fetch systems from database
+  useEffect(() => {
+    const fetchSystems = async () => {
+      try {
+        const res = await fetch("/api/systems");
+        if (res.ok) {
+          const data = await res.json();
+          // Map database fields to component interface and sort by order
+          const mappedTools: Tool[] = data
+            .map((system: any) => ({
+              id: system.id,
+              title: system.title,
+              summary: system.summary,
+              description: system.description,
+              order: system.order || 0,
+            }))
+            .sort((a: any, b: any) => a.order - b.order)
+            .slice(0, 6)
+            .map(({ order, ...tool }) => tool); // Remove order from final objects
+          setAllTools(mappedTools);
+        } else {
+          console.error("Failed to fetch systems");
+          // Fallback to empty array if fetch fails
+          setAllTools([]);
+        }
+      } catch (err) {
+        console.error("Error fetching systems:", err);
+        setAllTools([]);
+      } finally {
+        setToolsLoading(false);
+      }
+    };
+
+    fetchSystems();
+  }, []);
 
   const handleOpenDialog = (tool: Tool) => {
     setSelectedTool(tool);
@@ -141,7 +142,7 @@ const ToolsSection: React.FC = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           systemTitle: selectedTool?.title,
-          systemDescription: selectedTool?.fullDescription,
+          systemDescription: selectedTool?.description,
           name: name.trim(),
           email: email.trim(),
         }),
@@ -183,16 +184,26 @@ const ToolsSection: React.FC = () => {
         </div>
 
         {/* All Systems */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {allTools.slice(0, 6).map((tool, index) => (
-            <ToolCard 
-              key={index} 
-              title={tool.title} 
-              shortDescription={tool.shortDescription}
-              onOpen={() => handleOpenDialog(tool)}
-            />
-          ))}
-        </div>
+        {toolsLoading ? (
+          <div className="text-center py-12 text-[#71717a]">
+            <p>Loading systems...</p>
+          </div>
+        ) : allTools.length === 0 ? (
+          <div className="text-center py-12 text-[#71717a]">
+            <p>No systems available at the moment.</p>
+          </div>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {allTools.map((tool) => (
+              <ToolCard 
+                key={tool.id} 
+                title={tool.title} 
+                shortDescription={tool.summary}
+                onOpen={() => handleOpenDialog(tool)}
+              />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* System Access Dialog */}
@@ -210,7 +221,7 @@ const ToolsSection: React.FC = () => {
                   {selectedTool.title}
                 </DialogTitle>
                 <DialogDescription className="text-base text-[#71717a] font-light leading-relaxed mt-4">
-                  {selectedTool.fullDescription}
+                  {selectedTool.description}
                 </DialogDescription>
               </DialogHeader>
 

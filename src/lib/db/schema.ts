@@ -46,6 +46,16 @@ export const blogTags = pgTable("blog_tags", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const systems = pgTable("systems", {
+  id: text("id").primaryKey().default(sql`gen_random_uuid()::text`),
+  title: text("title").notNull(),
+  summary: text("summary").notNull(), // Short description for card
+  description: text("description").notNull(), // Full description for dialog
+  order: integer("order").notNull().default(0), // For ordering systems
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 export const blogPosts = pgTable("blog_posts", {
   id: text("id").primaryKey().default(sql`gen_random_uuid()::text`),
   // Core Content
