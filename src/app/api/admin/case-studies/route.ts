@@ -65,68 +65,148 @@ export async function POST(request: NextRequest) {
     
     // Normalize status
     const status = body.status || "draft";
+    
+    // Validate status value
+    if (status !== "draft" && status !== "published") {
+      return NextResponse.json(
+        { error: "Status must be either 'draft' or 'published'" },
+        { status: 400 }
+      );
+    }
+
+    // Prepare values object
+    const values = {
+      clientName: body.clientName.trim(),
+      industry: nullIfEmpty(body.industry),
+      slug: slug,
+      featuredImage: nullIfEmpty(body.featuredImage),
+      problemChallenge: nullIfEmpty(body.problemChallenge),
+      solutionOverview: nullIfEmpty(body.solutionOverview),
+      results: nullIfEmpty(body.results),
+      keyFeatures: nullIfEmpty(body.keyFeatures),
+      technicalStack: nullIfEmpty(body.technicalStack),
+      timeline: nullIfEmpty(body.timeline),
+      metaTitle: nullIfEmpty(body.metaTitle),
+      metaDescription: nullIfEmpty(body.metaDescription),
+      tags: nullIfEmpty(body.tags),
+      clientTestimonial: nullIfEmpty(body.clientTestimonial),
+      status: status,
+      isFeatured: isFeatured,
+      // Legacy fields for backward compatibility
+      title: body.clientName.trim() || nullIfEmpty(body.title),
+      description: nullIfEmpty(body.description),
+      fullDescription: nullIfEmpty(body.fullDescription),
+      metrics: nullIfEmpty(body.metrics),
+      details: nullIfEmpty(body.details),
+    };
+
+    // Log the values being inserted (for debugging - remove sensitive data in production)
+    console.log("Inserting case study with values:", {
+      clientName: values.clientName,
+      slug: values.slug,
+      status: values.status,
+      isFeatured: values.isFeatured,
+      hasProblemChallenge: !!values.problemChallenge,
+      hasSolutionOverview: !!values.solutionOverview,
+    });
 
     const newStudy = await db
       .insert(caseStudies)
-      .values({
-        clientName: body.clientName.trim(),
-        industry: nullIfEmpty(body.industry),
-        slug: slug,
-        featuredImage: nullIfEmpty(body.featuredImage),
-        problemChallenge: nullIfEmpty(body.problemChallenge),
-        solutionOverview: nullIfEmpty(body.solutionOverview),
-        results: nullIfEmpty(body.results),
-        keyFeatures: nullIfEmpty(body.keyFeatures),
-        technicalStack: nullIfEmpty(body.technicalStack),
-        timeline: nullIfEmpty(body.timeline),
-        metaTitle: nullIfEmpty(body.metaTitle),
-        metaDescription: nullIfEmpty(body.metaDescription),
-        tags: nullIfEmpty(body.tags),
-        clientTestimonial: nullIfEmpty(body.clientTestimonial),
-        status: status,
-        isFeatured: isFeatured,
-        // Legacy fields for backward compatibility
-        title: body.clientName.trim() || nullIfEmpty(body.title),
-        description: nullIfEmpty(body.description),
-        fullDescription: nullIfEmpty(body.fullDescription),
-        metrics: nullIfEmpty(body.metrics),
-        details: nullIfEmpty(body.details),
-      })
+      .values(values)
       .returning();
 
     return NextResponse.json(newStudy[0]);
   } catch (error: any) {
     console.error("Error creating case study:", error);
-    // Log more details for debugging
+    
+    // Try to unwrap Drizzle/PostgreSQL errors
+    let dbError = error;
+    
+    // Check for nested errors (Drizzle sometimes wraps them)
+    if (error.cause && typeof error.cause === 'object') {
+      dbError = error.cause;
+    } else if (error.originalError) {
+      dbError = error.originalError;
+    } else if (error.original) {
+      dbError = error.original;
+    }
+    
+    // Log comprehensive error details
     console.error("Error details:", {
       message: error.message,
-      code: error.code,
-      detail: error.detail,
-      constraint: error.constraint,
-      table: error.table,
-      column: error.column,
-      hint: error.hint,
+      dbErrorMessage: dbError.message,
+      code: dbError.code || error.code,
+      detail: dbError.detail || error.detail,
+      constraint: dbError.constraint || error.constraint,
+      table: dbError.table || error.table,
+      column: dbError.column || error.column,
+      hint: dbError.hint || error.hint,
+      // Log the full error structure for debugging
+      fullError: JSON.stringify(error, Object.getOwnPropertyNames(error), 2),
     });
     
+    // Extract error code from message if not in error object
+    let errorCode = dbError.code || error.code;
+    let errorDetail = dbError.detail || error.detail;
+    let errorHint = dbError.hint || error.hint;
+    let errorColumn = dbError.column || error.column;
+    let errorConstraint = dbError.constraint || error.constraint;
+    
+    // Try to parse error code from message if it contains "Failed query"
+    if (error.message && error.message.includes("Failed query")) {
+      // Extract PostgreSQL error codes from the message
+      const codeMatch = error.message.match(/code: (\w+)/i) || error.message.match(/\((\d{5})\)/);
+      if (codeMatch) {
+        errorCode = codeMatch[1];
+      }
+      
+      // Try to extract constraint name
+      const constraintMatch = error.message.match(/constraint "?(\w+)"?/i);
+      if (constraintMatch) {
+        errorConstraint = constraintMatch[1];
+      }
+      
+      // Try to extract column name
+      const columnMatch = error.message.match(/column "?(\w+)"?/i);
+      if (columnMatch) {
+        errorColumn = columnMatch[1];
+      }
+    }
+    
     // Provide more helpful error messages
-    let errorMessage = error.message || "Failed to create case study";
+    let errorMessage = dbError.message || error.message || "Failed to create case study";
     
     // Handle specific database errors
-    if (error.code === '23505') { // Unique violation
+    if (errorCode === '23505') { // Unique violation
       errorMessage = `A case study with this slug already exists. Please use a different slug.`;
-    } else if (error.code === '23502') { // Not null violation
-      errorMessage = `Missing required field: ${error.column || 'unknown field'}`;
-    } else if (error.code === '42703') { // Undefined column
-      errorMessage = `Database schema mismatch. Column '${error.column || 'unknown'}' does not exist. Please run the migration SQL.`;
-    } else if (error.detail) {
-      errorMessage = `${errorMessage}: ${error.detail}`;
+      if (errorConstraint) {
+        errorMessage += ` (Constraint: ${errorConstraint})`;
+      }
+    } else if (errorCode === '23502') { // Not null violation
+      errorMessage = `Missing required field: ${errorColumn || 'unknown field'}`;
+    } else if (errorCode === '42703') { // Undefined column
+      errorMessage = `Database schema mismatch. Column '${errorColumn || 'unknown'}' does not exist. Please run the migration SQL.`;
+    } else if (errorCode === '23514') { // Check violation
+      errorMessage = `Data validation failed: ${errorDetail || errorMessage}`;
+    } else if (errorDetail) {
+      errorMessage = `${errorMessage}: ${errorDetail}`;
+    } else if (errorHint) {
+      errorMessage = `${errorMessage}. ${errorHint}`;
+    }
+    
+    // Clean up error message - remove "Failed query:" prefix if present
+    if (errorMessage.startsWith("Failed query:")) {
+      errorMessage = errorMessage.replace(/^Failed query:\s*/i, "").trim();
     }
     
     return NextResponse.json(
       { 
         error: errorMessage,
-        details: error.detail || error.hint || null,
-        code: error.code || null
+        details: errorDetail || null,
+        hint: errorHint || null,
+        code: errorCode || null,
+        constraint: errorConstraint || null,
+        column: errorColumn || null,
       },
       { status: 500 }
     );

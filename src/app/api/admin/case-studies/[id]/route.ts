@@ -123,36 +123,90 @@ export async function PUT(
     return NextResponse.json(updated[0]);
   } catch (error: any) {
     console.error("Error updating case study:", error);
-    // Log more details for debugging
+    
+    // Try to unwrap Drizzle/PostgreSQL errors
+    let dbError = error;
+    
+    // Check for nested errors (Drizzle sometimes wraps them)
+    if (error.cause && typeof error.cause === 'object') {
+      dbError = error.cause;
+    } else if (error.originalError) {
+      dbError = error.originalError;
+    } else if (error.original) {
+      dbError = error.original;
+    }
+    
+    // Log comprehensive error details
     console.error("Error details:", {
       message: error.message,
-      code: error.code,
-      detail: error.detail,
-      constraint: error.constraint,
-      table: error.table,
-      column: error.column,
-      hint: error.hint,
+      dbErrorMessage: dbError.message,
+      code: dbError.code || error.code,
+      detail: dbError.detail || error.detail,
+      constraint: dbError.constraint || error.constraint,
+      table: dbError.table || error.table,
+      column: dbError.column || error.column,
+      hint: dbError.hint || error.hint,
     });
     
+    // Extract error code from message if not in error object
+    let errorCode = dbError.code || error.code;
+    let errorDetail = dbError.detail || error.detail;
+    let errorHint = dbError.hint || error.hint;
+    let errorColumn = dbError.column || error.column;
+    let errorConstraint = dbError.constraint || error.constraint;
+    
+    // Try to parse error code from message if it contains "Failed query"
+    if (error.message && error.message.includes("Failed query")) {
+      const codeMatch = error.message.match(/code: (\w+)/i) || error.message.match(/\((\d{5})\)/);
+      if (codeMatch) {
+        errorCode = codeMatch[1];
+      }
+      
+      const constraintMatch = error.message.match(/constraint "?(\w+)"?/i);
+      if (constraintMatch) {
+        errorConstraint = constraintMatch[1];
+      }
+      
+      const columnMatch = error.message.match(/column "?(\w+)"?/i);
+      if (columnMatch) {
+        errorColumn = columnMatch[1];
+      }
+    }
+    
     // Provide more helpful error messages
-    let errorMessage = error.message || "Failed to update case study";
+    let errorMessage = dbError.message || error.message || "Failed to update case study";
     
     // Handle specific database errors
-    if (error.code === '23505') { // Unique violation
+    if (errorCode === '23505') { // Unique violation
       errorMessage = `A case study with this slug already exists. Please use a different slug.`;
-    } else if (error.code === '23502') { // Not null violation
-      errorMessage = `Missing required field: ${error.column || 'unknown field'}`;
-    } else if (error.code === '42703') { // Undefined column
-      errorMessage = `Database schema mismatch. Column '${error.column || 'unknown'}' does not exist. Please run the migration SQL.`;
-    } else if (error.detail) {
-      errorMessage = `${errorMessage}: ${error.detail}`;
+      if (errorConstraint) {
+        errorMessage += ` (Constraint: ${errorConstraint})`;
+      }
+    } else if (errorCode === '23502') { // Not null violation
+      errorMessage = `Missing required field: ${errorColumn || 'unknown field'}`;
+    } else if (errorCode === '42703') { // Undefined column
+      errorMessage = `Database schema mismatch. Column '${errorColumn || 'unknown'}' does not exist. Please run the migration SQL.`;
+    } else if (errorCode === '23514') { // Check violation
+      errorMessage = `Data validation failed: ${errorDetail || errorMessage}`;
+    } else if (errorDetail) {
+      errorMessage = `${errorMessage}: ${errorDetail}`;
+    } else if (errorHint) {
+      errorMessage = `${errorMessage}. ${errorHint}`;
+    }
+    
+    // Clean up error message
+    if (errorMessage.startsWith("Failed query:")) {
+      errorMessage = errorMessage.replace(/^Failed query:\s*/i, "").trim();
     }
     
     return NextResponse.json(
       { 
         error: errorMessage,
-        details: error.detail || error.hint || null,
-        code: error.code || null
+        details: errorDetail || null,
+        hint: errorHint || null,
+        code: errorCode || null,
+        constraint: errorConstraint || null,
+        column: errorColumn || null,
       },
       { status: 500 }
     );
