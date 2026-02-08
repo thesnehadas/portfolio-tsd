@@ -20,8 +20,8 @@ export async function GET(request: NextRequest) {
 // Helper function to retry database operations on connection pool errors
 async function retryDbOperation<T>(
   operation: () => Promise<T>,
-  maxRetries = 2,
-  delayMs = 1000
+  maxRetries = 3, // Increased retries
+  initialDelayMs = 500 // Start with shorter delay
 ): Promise<T> {
   let lastError: any;
   
@@ -35,15 +35,19 @@ async function retryDbOperation<T>(
       const isPoolError = 
         error.message?.includes('MaxClientsInSessionMode') ||
         error.message?.includes('max clients reached') ||
+        error.message?.includes('connection limit') ||
         error.message?.includes('connection') ||
         error.code === '57P01' || // Admin shutdown
         error.code === '57P02' || // Crash shutdown
         error.code === '57P03';    // Cannot connect now
       
       if (isPoolError && attempt < maxRetries) {
-        // Wait before retrying (exponential backoff)
-        const waitTime = delayMs * Math.pow(2, attempt);
-        console.log(`Connection pool error, retrying in ${waitTime}ms (attempt ${attempt + 1}/${maxRetries + 1})...`);
+        // Exponential backoff with jitter
+        const baseDelay = initialDelayMs * Math.pow(2, attempt);
+        const jitter = Math.random() * 500; // Add random jitter up to 500ms
+        const waitTime = baseDelay + jitter;
+        
+        console.log(`Connection pool error (attempt ${attempt + 1}/${maxRetries + 1}), retrying in ${Math.round(waitTime)}ms...`);
         await new Promise(resolve => setTimeout(resolve, waitTime));
         continue;
       }

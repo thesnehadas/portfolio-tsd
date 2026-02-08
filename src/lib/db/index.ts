@@ -37,21 +37,30 @@ function fixConnectionString(url: string): string {
 
 const connectionString = fixConnectionString(process.env.DATABASE_URL);
 
+// Check if we should use Supabase connection pooler (port 6543)
+// The pooler URL typically has ?pgbouncer=true or uses port 6543
+// If using direct connection, we need very small pools for serverless
+const usePooler = connectionString.includes('pgbouncer=true') || 
+                  connectionString.includes(':6543') ||
+                  connectionString.includes('pooler.supabase.com');
+
 // Supabase connection pool configuration
-// Free tier typically allows 15-20 connections, but we use a smaller pool
-// to avoid hitting limits and allow for connection overhead
+// For serverless environments, each instance creates its own pool
+// So we need very small pools (1-2 connections max) to avoid exhausting Supabase limits
+// Free tier typically allows 15-20 TOTAL connections across all instances
 const pool = new Pool({
   connectionString: connectionString,
   ssl: {
     rejectUnauthorized: false
   },
-  // Reduced pool size for Supabase compatibility
-  max: 5, // Reduced from 20 to avoid hitting Supabase limits
-  min: 1, // Keep at least 1 connection ready
-  idleTimeoutMillis: 20000, // Close idle connections after 20s
-  connectionTimeoutMillis: 10000, // Timeout after 10s (reduced from 30s)
-  // Allow the pool to create connections on demand
-  allowExitOnIdle: false,
+  // Very small pool for serverless compatibility
+  // If using pooler, we can use slightly more connections
+  max: usePooler ? 2 : 1, // 1 connection per instance for direct, 2 for pooler
+  min: 0, // Don't keep connections idle in serverless (they'll be created on demand)
+  idleTimeoutMillis: 10000, // Close idle connections quickly (10s)
+  connectionTimeoutMillis: 5000, // Fast timeout (5s)
+  // In serverless, we want to allow exit on idle to free up connections
+  allowExitOnIdle: true,
 });
 
 // Handle connection errors
@@ -67,9 +76,13 @@ if (process.env.NODE_ENV === 'development') {
       totalCount: pool.totalCount,
       idleCount: pool.idleCount,
       waitingCount: pool.waitingCount,
+      usingPooler: usePooler,
     });
   }, 30000); // Every 30 seconds
 }
+
+// Log connection info on startup
+console.log(`Database connection configured: ${usePooler ? 'Using Supabase Pooler' : 'Direct connection'} (max: ${usePooler ? 2 : 1} connections per instance)`);
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
