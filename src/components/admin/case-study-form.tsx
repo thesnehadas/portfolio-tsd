@@ -132,7 +132,15 @@ export function CaseStudyForm({ initialData }: { initialData?: CaseStudy }) {
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || "Failed to save");
+        // Show more detailed error message
+        let errorMsg = data.error || "Failed to save";
+        if (data.details) {
+          errorMsg += `\n\nDetails: ${data.details}`;
+        }
+        if (data.code) {
+          errorMsg += `\n\nError Code: ${data.code}`;
+        }
+        throw new Error(errorMsg);
       }
 
       toast.success(initialData?.id ? "Case study updated!" : "Case study created!");
@@ -150,7 +158,8 @@ export function CaseStudyForm({ initialData }: { initialData?: CaseStudy }) {
     <form onSubmit={handleSubmit} className="space-y-8">
       {error && (
         <div className="p-4 bg-red-50 border border-red-200 rounded text-red-700">
-          {error}
+          <p className="font-semibold mb-1">Error:</p>
+          <pre className="whitespace-pre-wrap text-sm">{error}</pre>
         </div>
       )}
 
@@ -440,7 +449,15 @@ export function CaseStudyForm({ initialData }: { initialData?: CaseStudy }) {
               });
               if (!res.ok) {
                 const data = await res.json();
-                throw new Error(data.error || "Failed to save");
+                // Show more detailed error message
+                let errorMsg = data.error || "Failed to save";
+                if (data.details) {
+                  errorMsg += `\n\nDetails: ${data.details}`;
+                }
+                if (data.code) {
+                  errorMsg += `\n\nError Code: ${data.code}`;
+                }
+                throw new Error(errorMsg);
               }
               toast.success("Saved as draft!");
               router.push("/admin/case-studies");

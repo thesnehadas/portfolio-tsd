@@ -30,11 +30,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Normalize slug (trim and ensure it's not empty)
+    const slug = body.slug.trim();
+    if (!slug) {
+      return NextResponse.json(
+        { error: "Slug cannot be empty" },
+        { status: 400 }
+      );
+    }
+
     // Check if slug already exists
     const existing = await db
       .select()
       .from(caseStudies)
-      .where(eq(caseStudies.slug, body.slug))
+      .where(eq(caseStudies.slug, slug))
       .limit(1);
 
     if (existing.length > 0) {
@@ -44,39 +53,81 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Helper function to convert empty strings to null
+    const nullIfEmpty = (value: any) => {
+      if (value === undefined || value === null) return null;
+      if (typeof value === 'string' && value.trim() === '') return null;
+      return value;
+    };
+
+    // Normalize isFeatured to be 0 or 1
+    const isFeatured = body.isFeatured === true || body.isFeatured === 1 || body.isFeatured === '1' ? 1 : 0;
+    
+    // Normalize status
+    const status = body.status || "draft";
+
     const newStudy = await db
       .insert(caseStudies)
       .values({
-        clientName: body.clientName,
-        industry: body.industry || null,
-        slug: body.slug,
-        featuredImage: body.featuredImage || null,
-        problemChallenge: body.problemChallenge || null,
-        solutionOverview: body.solutionOverview || null,
-        results: body.results || null,
-        keyFeatures: body.keyFeatures || null,
-        technicalStack: body.technicalStack || null,
-        timeline: body.timeline || null,
-        metaTitle: body.metaTitle || null,
-        metaDescription: body.metaDescription || null,
-        tags: body.tags || null,
-        clientTestimonial: body.clientTestimonial || null,
-        status: body.status || "draft",
-        isFeatured: body.isFeatured || 0,
+        clientName: body.clientName.trim(),
+        industry: nullIfEmpty(body.industry),
+        slug: slug,
+        featuredImage: nullIfEmpty(body.featuredImage),
+        problemChallenge: nullIfEmpty(body.problemChallenge),
+        solutionOverview: nullIfEmpty(body.solutionOverview),
+        results: nullIfEmpty(body.results),
+        keyFeatures: nullIfEmpty(body.keyFeatures),
+        technicalStack: nullIfEmpty(body.technicalStack),
+        timeline: nullIfEmpty(body.timeline),
+        metaTitle: nullIfEmpty(body.metaTitle),
+        metaDescription: nullIfEmpty(body.metaDescription),
+        tags: nullIfEmpty(body.tags),
+        clientTestimonial: nullIfEmpty(body.clientTestimonial),
+        status: status,
+        isFeatured: isFeatured,
         // Legacy fields for backward compatibility
-        title: body.clientName || body.title || null,
-        description: body.description || null,
-        fullDescription: body.fullDescription || null,
-        metrics: body.metrics || null,
-        details: body.details || null,
+        title: body.clientName.trim() || nullIfEmpty(body.title),
+        description: nullIfEmpty(body.description),
+        fullDescription: nullIfEmpty(body.fullDescription),
+        metrics: nullIfEmpty(body.metrics),
+        details: nullIfEmpty(body.details),
       })
       .returning();
 
     return NextResponse.json(newStudy[0]);
   } catch (error: any) {
     console.error("Error creating case study:", error);
+    // Log more details for debugging
+    console.error("Error details:", {
+      message: error.message,
+      code: error.code,
+      detail: error.detail,
+      constraint: error.constraint,
+      table: error.table,
+      column: error.column,
+      hint: error.hint,
+    });
+    
+    // Provide more helpful error messages
+    let errorMessage = error.message || "Failed to create case study";
+    
+    // Handle specific database errors
+    if (error.code === '23505') { // Unique violation
+      errorMessage = `A case study with this slug already exists. Please use a different slug.`;
+    } else if (error.code === '23502') { // Not null violation
+      errorMessage = `Missing required field: ${error.column || 'unknown field'}`;
+    } else if (error.code === '42703') { // Undefined column
+      errorMessage = `Database schema mismatch. Column '${error.column || 'unknown'}' does not exist. Please run the migration SQL.`;
+    } else if (error.detail) {
+      errorMessage = `${errorMessage}: ${error.detail}`;
+    }
+    
     return NextResponse.json(
-      { error: error.message || "Failed to create case study" },
+      { 
+        error: errorMessage,
+        details: error.detail || error.hint || null,
+        code: error.code || null
+      },
       { status: 500 }
     );
   }
