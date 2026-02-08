@@ -10,39 +10,59 @@ if (!process.env.DATABASE_URL) {
 // PostgreSQL connection strings: postgresql://user:password@host:port/db
 // If password contains special characters like @, they must be URL encoded
 function fixConnectionString(url: string): string {
+  // Check if password might contain unencoded special characters
+  // Look for pattern: postgresql://user:password@host
+  // If there are multiple @ signs before the host, password likely contains @
+  const atSignCount = (url.match(/@/g) || []).length;
+  
+  // If there's more than one @, the password likely contains an unencoded @
+  if (atSignCount > 1) {
+    // Try to parse: postgresql://user:password@rest
+    // We need to find the LAST @ which separates credentials from host
+    // The host part starts after the last @
+    const lastAtIndex = url.lastIndexOf('@');
+    if (lastAtIndex > 0) {
+      const beforeAt = url.substring(0, lastAtIndex); // postgresql://user:password
+      const afterAt = url.substring(lastAtIndex + 1); // host:port/db
+      
+      // Extract user and password (password may contain @)
+      const userPassMatch = beforeAt.match(/^postgresql:\/\/([^:]+):(.+)$/);
+      if (userPassMatch) {
+        const [, user, password] = userPassMatch;
+        // If password isn't already encoded, encode it
+        if (password && !password.includes('%')) {
+          const encodedPassword = encodeURIComponent(password);
+          const fixedUrl = `postgresql://${user}:${encodedPassword}@${afterAt}`;
+          console.log('Fixed connection string: encoded password with special characters');
+          return fixedUrl;
+        }
+      }
+    }
+  }
+  
+  // If no special characters detected or already encoded, try standard URL parsing
   try {
-    // Try to parse the URL
     const urlObj = new URL(url);
-    
-    // If password exists and contains @, encode it
+    // Double-check password encoding
     if (urlObj.password && urlObj.password.includes('@') && !urlObj.password.includes('%40')) {
       urlObj.password = encodeURIComponent(urlObj.password);
       return urlObj.toString();
     }
-    
     return url;
   } catch (e) {
-    // If URL parsing fails, try manual parsing
-    const match = url.match(/^postgresql:\/\/([^:]+):([^@]+)@(.+)$/);
-    if (match) {
-      const [, user, password, rest] = match;
-      if (password.includes('@') && !password.includes('%40')) {
-        const encodedPassword = encodeURIComponent(password);
-        return `postgresql://${user}:${encodedPassword}@${rest}`;
-      }
-    }
+    // If URL parsing fails, return as-is (might already be correct)
     return url;
   }
 }
 
 const connectionString = fixConnectionString(process.env.DATABASE_URL);
 
-// Check if we should use Supabase connection pooler (port 6543)
-// The pooler URL typically has ?pgbouncer=true or uses port 6543
-// If using direct connection, we need very small pools for serverless
-const usePooler = connectionString.includes('pgbouncer=true') || 
-                  connectionString.includes(':6543') ||
-                  connectionString.includes('pooler.supabase.com');
+// Check if we should use Supabase connection pooler
+// The pooler URL uses pooler.supabase.com domain
+// Port 5432 = Transaction mode (recommended for serverless)
+// Port 6543 = Session mode (for long-lived connections)
+const usePooler = connectionString.includes('pooler.supabase.com') ||
+                  connectionString.includes('pgbouncer=true');
 
 // Supabase connection pool configuration
 // For serverless environments, each instance creates its own pool
