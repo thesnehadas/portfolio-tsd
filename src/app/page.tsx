@@ -4,6 +4,7 @@ import SocialProofSection from "@/components/sections/social-proof";
 import WhatIDo from "@/components/sections/what-i-do";
 import WhoIHelp from "@/components/sections/who-i-help";
 import CaseStudiesSection from "@/components/sections/case-studies";
+import TestimonialSection from "@/components/sections/testimonial";
 import ToolsSection from "@/components/sections/tools";
 import AboutSection from "@/components/sections/about";
 import BlogSignalSection from "@/components/sections/blog-signal";
@@ -21,6 +22,7 @@ export default function Home() {
         <WhatIDo />
         <WhoIHelp />
         <CaseStudiesSection />
+        <TestimonialSection />
         <ToolsSection />
         <AboutSection />
         <BlogSignalSection />
