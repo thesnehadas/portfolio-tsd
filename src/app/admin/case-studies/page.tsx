@@ -49,13 +49,58 @@ export default async function CaseStudiesPage() {
           <h3 className="text-lg font-semibold text-red-800 mb-2">Setup Required</h3>
           <p className="text-red-700 mb-4">{error}</p>
           <div className="bg-white p-4 rounded border border-red-200">
-            <p className="text-sm text-red-600 mb-2 font-semibold">To fix this:</p>
-            <ol className="list-decimal list-inside space-y-1 text-sm text-red-600">
-              <li>Open your Supabase SQL Editor</li>
-              <li>Copy the contents of <code className="bg-red-50 px-1 rounded">drizzle/create_case_studies_table_updated.sql</code></li>
-              <li>Run the SQL migration</li>
-              <li>Refresh this page</li>
-            </ol>
+            <p className="text-sm text-red-600 mb-3 font-semibold">To fix this, run this SQL in your Supabase SQL Editor:</p>
+            <div className="bg-gray-900 text-gray-100 p-4 rounded text-xs overflow-x-auto mb-3">
+              <pre className="whitespace-pre-wrap">{`-- Update case_studies table with new fields
+ALTER TABLE case_studies 
+ADD COLUMN IF NOT EXISTS client_name TEXT,
+ADD COLUMN IF NOT EXISTS industry TEXT,
+ADD COLUMN IF NOT EXISTS slug TEXT,
+ADD COLUMN IF NOT EXISTS featured_image TEXT,
+ADD COLUMN IF NOT EXISTS problem_challenge TEXT,
+ADD COLUMN IF NOT EXISTS solution_overview TEXT,
+ADD COLUMN IF NOT EXISTS results TEXT,
+ADD COLUMN IF NOT EXISTS key_features TEXT,
+ADD COLUMN IF NOT EXISTS technical_stack TEXT,
+ADD COLUMN IF NOT EXISTS timeline TEXT,
+ADD COLUMN IF NOT EXISTS meta_title TEXT,
+ADD COLUMN IF NOT EXISTS meta_description TEXT,
+ADD COLUMN IF NOT EXISTS tags TEXT,
+ADD COLUMN IF NOT EXISTS client_testimonial TEXT,
+ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'draft',
+ADD COLUMN IF NOT EXISTS is_featured INTEGER NOT NULL DEFAULT 0;
+
+-- Make slug unique after adding it
+DO $$ 
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'case_studies_slug_unique'
+  ) THEN
+    ALTER TABLE case_studies ADD CONSTRAINT case_studies_slug_unique UNIQUE (slug);
+  END IF;
+END $$;
+
+-- Create indexes
+CREATE INDEX IF NOT EXISTS idx_case_studies_slug ON case_studies(slug);
+CREATE INDEX IF NOT EXISTS idx_case_studies_status ON case_studies(status);
+CREATE INDEX IF NOT EXISTS idx_case_studies_is_featured ON case_studies(is_featured);
+
+-- Migrate existing data
+UPDATE case_studies 
+SET client_name = title 
+WHERE client_name IS NULL AND title IS NOT NULL;
+
+UPDATE case_studies 
+SET slug = LOWER(REPLACE(REPLACE(REPLACE(REPLACE(COALESCE(title, 'untitled'), ' ', '-'), '_', '-'), '--', '-'), '---', '-'))
+WHERE slug IS NULL AND title IS NOT NULL;
+
+UPDATE case_studies 
+SET status = 'published' 
+WHERE status IS NULL;`}</pre>
+            </div>
+            <p className="text-xs text-red-600">
+              After running the SQL, refresh this page.
+            </p>
           </div>
         </div>
       ) : (
