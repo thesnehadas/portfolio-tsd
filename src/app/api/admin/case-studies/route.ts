@@ -139,7 +139,8 @@ export async function POST(request: NextRequest) {
       isFeatured: isFeatured,
       // Legacy fields for backward compatibility
       title: body.clientName.trim() || nullIfEmpty(body.title),
-      description: nullIfEmpty(body.description),
+      // Ensure description is always set (even if empty) to avoid NOT NULL constraint issues
+      description: nullIfEmpty(body.description) || nullIfEmpty(body.metaDescription) || null,
       fullDescription: nullIfEmpty(body.fullDescription),
       metrics: nullIfEmpty(body.metrics),
       details: nullIfEmpty(body.details),

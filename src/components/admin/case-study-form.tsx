@@ -74,6 +74,11 @@ export function CaseStudyForm({ initialData }: { initialData?: CaseStudy }) {
     clientTestimonial: initialData?.clientTestimonial || "",
     status: initialData?.status || "draft",
     isFeatured: initialData?.isFeatured || 0,
+    // Legacy fields
+    description: initialData?.description || "",
+    fullDescription: initialData?.fullDescription || "",
+    metrics: initialData?.metrics || "",
+    details: initialData?.details || "",
   });
 
   // Auto-generate slug when client name changes
@@ -242,6 +247,23 @@ export function CaseStudyForm({ initialData }: { initialData?: CaseStudy }) {
       {/* Content Section */}
       <div className="space-y-4 border-b pb-6">
         <h2 className="text-xl font-semibold text-[#09090b]">Content</h2>
+        
+        <div>
+          <Label htmlFor="description">Short Description</Label>
+          <Textarea
+            id="description"
+            value={formData.description}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
+            className="mt-1"
+            rows={3}
+            placeholder="A brief summary of the case study (optional)"
+          />
+          <p className="text-sm text-[#71717a] mt-1">
+            Short description for previews and listings
+          </p>
+        </div>
         
         <div>
           <Label htmlFor="problemChallenge">Problem / Challenge</Label>
