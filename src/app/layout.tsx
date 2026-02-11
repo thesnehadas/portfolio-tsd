@@ -8,9 +8,9 @@ export const metadata: Metadata = {
   title: "Sneha Das | AI Agents for Marketing, Sales & Ops",
   description: "AI infrastructure for pipeline generation, sales acceleration, and operational efficiency that drives measurable outcomes.",
   icons: {
-    icon: "/otherlogos/name_logo.gif",
-    shortcut: "/otherlogos/name_logo.gif",
-    apple: "/otherlogos/name_logo.gif",
+    icon: "/sneha-das-dp.png",
+    shortcut: "/sneha-das-dp.png",
+    apple: "/sneha-das-dp.png",
   },
 };
 
