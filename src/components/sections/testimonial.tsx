@@ -51,7 +51,9 @@ const TestimonialSection: React.FC = () => {
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
-        const response = await fetch('/api/testimonials');
+        const response = await fetch('/api/testimonials', {
+          cache: 'no-store',
+        });
         if (response.ok) {
           const data = await response.json();
           setTestimonials(data);
@@ -64,6 +66,10 @@ const TestimonialSection: React.FC = () => {
     };
 
     fetchTestimonials();
+    
+    // Auto-refresh every 10 seconds
+    const interval = setInterval(fetchTestimonials, 10000);
+    return () => clearInterval(interval);
   }, []);
 
   const plugin = React.useRef(

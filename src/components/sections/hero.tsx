@@ -54,7 +54,7 @@ const HeroSection: React.FC = () => {
 
   return (
     <section 
-      className="min-h-[70vh] flex flex-col justify-center px-6 md:px-12 lg:px-24 max-w-5xl mx-auto pb-4 pt-24 md:pt-32 relative"
+      className="min-h-[70vh] flex flex-col justify-center px-6 md:px-12 lg:px-24 max-w-5xl mx-auto pb-12 md:pb-4 pt-24 md:pt-32 relative"
       style={{
         backgroundColor: 'transparent',
       }}
@@ -91,13 +91,13 @@ const HeroSection: React.FC = () => {
 
       {/* Subtext */}
       <p 
-        className="text-lg md:text-xl max-w-2xl mb-10 font-sans font-light leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 ease-out fill-mode-both text-muted-foreground"
+        className="text-lg md:text-xl max-w-2xl mb-8 md:mb-10 font-sans font-light leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 ease-out fill-mode-both text-muted-foreground"
       >
         AI infrastructure for pipeline generation, sales acceleration, and operational efficiency that drives measurable outcomes.
       </p>
 
       {/* Call to Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500 ease-out fill-mode-both">
+      <div className="flex flex-col sm:flex-row gap-4 mb-4 md:mb-0 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500 ease-out fill-mode-both">
         {/* Primary Action */}
         <a 
           href="#contact" 
@@ -132,10 +132,11 @@ const HeroSection: React.FC = () => {
         href={currentOutlet.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="absolute bottom-8 right-6 md:right-12 lg:right-24 flex items-center gap-1.5 text-xs font-sans hover:opacity-80 transition-all duration-500 group text-muted-foreground"
+        className="absolute bottom-4 md:bottom-8 right-6 md:right-12 lg:right-24 flex items-center gap-1.5 text-xs font-sans hover:opacity-80 transition-all duration-500 group text-muted-foreground"
         key={currentIndex}
       >
-        <span>Know more about me on</span>
+        <span className="hidden sm:inline">Know more about me on</span>
+        <span className="sm:hidden">On</span>
         <span>{currentOutlet.name}</span>
         <img 
           src={currentOutlet.logo} 

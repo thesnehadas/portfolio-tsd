@@ -84,7 +84,9 @@ const ToolsSection: React.FC = () => {
   useEffect(() => {
     const fetchSystems = async () => {
       try {
-        const res = await fetch("/api/systems");
+        const res = await fetch("/api/systems", {
+          cache: 'no-store',
+        });
         if (res.ok) {
           const data = await res.json();
           // Map database fields to component interface and sort by order
@@ -114,6 +116,10 @@ const ToolsSection: React.FC = () => {
     };
 
     fetchSystems();
+    
+    // Auto-refresh every 10 seconds
+    const interval = setInterval(fetchSystems, 10000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleOpenDialog = (tool: Tool) => {
@@ -208,7 +214,7 @@ const ToolsSection: React.FC = () => {
 
       {/* System Access Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl bg-[#fdfaf3] border-2 border-[#4a3728]">
+        <DialogContent className="max-w-2xl bg-[#fdfaf3] border-2 border-[#4a3728] max-h-[90vh] overflow-y-auto">
           {selectedTool && (
             <>
               <DialogHeader>
@@ -227,7 +233,7 @@ const ToolsSection: React.FC = () => {
 
               <div className="mt-6">
                 <h3 className="text-lg font-serif font-semibold text-[#09090b] mb-6">
-                  Unlock access to this toolkit
+                  Know more about this system
                 </h3>
 
                 {success ? (
@@ -277,7 +283,7 @@ const ToolsSection: React.FC = () => {
                       disabled={loading}
                       className="w-full bg-[#09090b] text-white hover:bg-[#09090b]/90 mt-6"
                     >
-                      {loading ? "Submitting..." : "Unlock access"}
+                      {loading ? "Submitting..." : "Know more"}
                     </Button>
                   </form>
                 )}

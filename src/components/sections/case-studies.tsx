@@ -92,7 +92,9 @@ const CaseStudiesSection: React.FC = () => {
   useEffect(() => {
     const fetchCaseStudies = async () => {
       try {
-        const response = await fetch('/api/case-studies?featured=true&status=published');
+        const response = await fetch('/api/case-studies?featured=true&status=published', {
+          cache: 'no-store',
+        });
         if (response.ok) {
           const data = await response.json();
           setCaseStudies(data);
@@ -105,6 +107,10 @@ const CaseStudiesSection: React.FC = () => {
     };
 
     fetchCaseStudies();
+    
+    // Auto-refresh every 10 seconds
+    const interval = setInterval(fetchCaseStudies, 10000);
+    return () => clearInterval(interval);
   }, []);
 
   const plugin = React.useRef(
