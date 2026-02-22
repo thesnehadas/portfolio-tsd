@@ -48,37 +48,49 @@ const CaseStudyCard: React.FC<CaseStudyProps & { onOpen: () => void }> = ({
   return (
     <button
       onClick={onOpen}
-      className="bg-[#fdfaf3] border-2 border-[#4a3728]/30 rounded-lg p-8 md:p-10 lg:p-12 transition-all duration-200 hover:border-[#4a3728] hover:shadow-[4px_4px_0px_#4a3728] max-w-2xl mx-auto w-full text-left cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[#4a3728]"
+      className="group relative bg-gradient-to-br from-[#fdfaf3] to-white border-2 border-[#4a3728]/30 rounded-2xl p-6 transition-all duration-300 hover:border-[#4a3728] hover:shadow-[8px_8px_0px_#4a3728] hover:-translate-y-1 max-w-2xl mx-auto w-full text-left cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[#4a3728] focus-visible:ring-offset-2 overflow-hidden"
     >
+      {/* Accent gradient overlay */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#4a3728]/5 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      
+      {/* Featured Image */}
+      {featuredImage && (
+        <div className="mb-5 -mx-6 -mt-6 rounded-t-2xl overflow-hidden relative">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent z-10"></div>
+          <img
+            src={featuredImage}
+            alt={displayName}
+            className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-110"
+          />
+        </div>
+      )}
+
       {/* Retro Window Dots */}
-      <div className="flex items-center gap-1.5 mb-6">
+      <div className="flex items-center gap-1.5 mb-4">
         <div className="w-2.5 h-2.5 rounded-full bg-[#e15b5b]"></div>
         <div className="w-2.5 h-2.5 rounded-full bg-[#f1c40f]"></div>
         <div className="w-2.5 h-2.5 rounded-full bg-[#2ecc71]"></div>
       </div>
       
-      {/* Featured Image */}
-      {featuredImage && (
-        <div className="mb-6 -mx-8 md:-mx-10 lg:-mx-12 -mt-8 md:-mt-10 lg:-mt-12">
-          <img
-            src={featuredImage}
-            alt={displayName}
-            className="w-full h-48 object-cover"
-          />
-        </div>
-      )}
-      
       {/* Title */}
-      <h3 className="text-2xl md:text-3xl font-serif font-semibold text-[#09090b] mb-4">
+      <h3 className="text-xl md:text-2xl font-serif font-bold text-[#09090b] mb-3 leading-tight group-hover:text-[#4a3728] transition-colors">
         {displayName}
       </h3>
       
       {/* Description */}
       {description && (
-        <p className="text-lg md:text-xl text-[#71717a] font-light leading-relaxed">
+        <p className="text-sm md:text-base text-[#71717a] font-normal leading-relaxed line-clamp-3 mb-4">
           {description}
         </p>
       )}
+      
+      {/* Read More Indicator */}
+      <div className="mt-4 flex items-center text-[#4a3728] text-sm font-semibold group-hover:text-[#4a3728] transition-all">
+        <span className="group-hover:translate-x-1 transition-transform duration-300">Read case study</span>
+        <svg className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+        </svg>
+      </div>
     </button>
   );
 };
